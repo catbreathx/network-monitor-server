@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "monitor-daemon"
+version = "0.1.0"
+description = ""
+authors = ["Stewart Hector <stewart@stewarthector.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+SQLAlchemy = "1.4.39"
+alembic = "^1.8.1"
+psycopg2 = "^2.9.3"
+uvicorn = "^0.18.2"
+fastapi = "^0.79.0"
+python-dotenv = "^0.20.0"
+pydantic = {extras = ["dotenv"], version = "^1.9.1"}
+
+
+[tool.poetry.dev-dependencies]
+flake8 = "^4.0.1"
+pre-commit = "^2.20.0"
+black = "^22.6.0"
+pytest = "^7.1.2"
+requests = "^2.28.1"
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 100
