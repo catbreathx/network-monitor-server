@@ -8,11 +8,13 @@ from monitor.app import app
 from monitor.database import models
 from monitor.service import create_host_service, HostService
 from test.unit.routes.base_test import BaseRouteTest
-from test.unit.utils import model_list_to_json
+from test.unit.utils import model_list_to_json, model_to_json
+
+GET_PATH = "/api/v1/host"
 
 
-class TestHost(BaseRouteTest):
-    mock_host_service = None
+class BaseTestHost(BaseRouteTest):
+    mock_host_service: HostService = None
 
     @pytest.fixture
     def host_data(self):
@@ -36,16 +38,44 @@ class TestHost(BaseRouteTest):
 
         yield
 
-    def test_get_host_and_return_all_hosts(self, test_client, host_data):
+
+class TestGetAllHost(BaseTestHost):
+    def test_success_and_return_200(self, test_client, host_data):
         self.mock_host_service.get_all.return_value = host_data
 
-        response = test_client.get("/api/v1/host")
+        response = test_client.get(GET_PATH)
         assert response.status_code == HTTPStatus.OK
 
         expected = model_list_to_json(host_data)
         assert response.json() == expected
 
-    def test_get_host_and_expect_500_exception(self, test_client):
+    def test_raise_exception_and_then_expect_500_exception(self, test_client):
         self.mock_host_service.get_all.side_effect = Exception("test exception")
-        response = test_client.get("/api/v1/host")
+        response = test_client.get(GET_PATH)
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+
+
+class TestGetOneHost(BaseTestHost):
+    def test_when_resource_found_and_return_200(self, test_client, host_data):
+        self.mock_host_service.get_one.return_value = host_data[0]
+
+        resource_id = "1"
+        response = test_client.get(f"{GET_PATH}/{resource_id}")
+
+        expect = model_to_json(host_data[0])
+        assert response.status_code == HTTPStatus.OK
+        assert response.json() == expect
+
+    def test_when_resource_not_found_and_return_404(self, test_client, host_data):
+        self.mock_host_service.get_one.return_value = None
+        resource_id = "1"
+        response = test_client.get(f"{GET_PATH}/{resource_id}")
+
+        expected_response = {
+            "message": "Resource Not Found",
+            "resource_id": resource_id,
+            "resource_type": "host",
+        }
+
+        assert response.status_code == HTTPStatus.NOT_FOUND
+        assert response.json() == expected_response

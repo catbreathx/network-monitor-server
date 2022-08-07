@@ -1,11 +1,13 @@
-from pydantic import BaseSettings, PostgresDsn, Field
+from pydantic import BaseSettings, PostgresDsn, Field, SecretStr
 
 
 class Settings(BaseSettings):
-    database_url: PostgresDsn = Field(env='DATABASE_URL')
+    database_url: PostgresDsn = Field(env="DATABASE_URL")
+    secret_key: SecretStr = Field(env="SECRET_KEY")
+    jwt_token_expiration_minutes: int = Field(env="JWT_TOKEN_EXPIRATION_MINUTES")
 
     class Config:
-        env_file = '.env'
+        env_file = ".env"
 
 
 app_settings: Settings

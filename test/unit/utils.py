@@ -6,13 +6,12 @@ from monitor.database.db import Base
 
 
 class AlchemyEncoder(json.JSONEncoder):
-
     def default(self, obj):
         if isinstance(obj.__class__, DeclarativeMeta):
             # an SQLAlchemy class
             fields = {}
-            for field in [x for x in dir(obj) if not x.startswith('_') and x != 'metadata']:
-                if field in ['registry']:
+            for field in [x for x in dir(obj) if not x.startswith("_") and x != "metadata"]:
+                if field in ["registry"]:
                     continue
 
                 data = obj.__getattribute__(field)
@@ -29,4 +28,9 @@ class AlchemyEncoder(json.JSONEncoder):
 
 def model_list_to_json(models: list[Base]) -> list[dict]:
     result = [json.loads(json.dumps(model, cls=AlchemyEncoder)) for model in models]
+    return result
+
+
+def model_to_json(model: Base) -> list[dict]:
+    result = json.loads(json.dumps(model, cls=AlchemyEncoder))
     return result

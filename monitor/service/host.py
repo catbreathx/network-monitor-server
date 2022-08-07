@@ -36,6 +36,6 @@ class HostService:
         return host
 
 
-def create_host_service(db_session: Session = Depends(get_db_session)):
+def create_host_service(db_session: Session = Depends(get_db_session)) -> HostService:
     service = HostService(db_session, HostRepository())
     return service

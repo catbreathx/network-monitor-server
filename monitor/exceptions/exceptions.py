@@ -14,3 +14,7 @@ class ResourceNotFoundException(Exception):
         super(ResourceNotFoundException, self).__init__()
         self._resource_id = resource_id
         self._resource_type = resource_type
+
+
+class AuthenticationException(Exception):
+    pass
