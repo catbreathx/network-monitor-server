@@ -1,4 +1,7 @@
-from pydantic import BaseModel, SecretBytes, SecretStr
+from builtins import ValueError
+from typing import Union
+
+from pydantic import BaseModel, validator
 
 
 class BaseUser(BaseModel):
@@ -12,8 +15,20 @@ class User(BaseUser):
 
 
 class UserCreate(BaseUser):
-    password: SecretStr
-    confirm_password: SecretStr
+    password: str
+    confirm_password: str
+
+    @validator("password")
+    def validate_password(cls, value: str, values: dict[str : Union[str, int, bool]]):
+        return value
+
+    @validator("confirm_password")
+    def passwords_match(cls, value: str, values: dict[str : Union[str, int, bool]]):
+        password = values.get("password", "")
+        if value != password:
+            raise ValueError("Passwords do not match")
+
+        return value
 
     class Config:
         orm_mode = True
@@ -25,8 +40,8 @@ class PutUser(BaseModel):
 
 
 class ChangePassword(BaseModel):
-    password: SecretBytes
-    confirm_password: SecretBytes
+    password: str
+    confirm_password: str
 
     class Config:
         orm_mode = True

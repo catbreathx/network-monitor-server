@@ -27,7 +27,7 @@ class BaseTestUser(BaseRouteTest):
         yield
 
     @pytest.fixture()
-    def post_payload(self):
+    def post_payload(self) -> dict[str, str]:
         user = {
             "email": "user@email.com",
             "first_name": "bob",
@@ -43,7 +43,7 @@ class TestPostUser(BaseTestUser):
     def test_success_and_return_200(self, test_client, post_payload):
         user_create = UserCreate(**post_payload)
 
-        response = test_client.post(POST_PATH, json=post_payload)
+        response = test_client.post(POST_PATH, json=user_create.dict())
         assert response.status_code == HTTPStatus.OK
 
         self.mock_user_service.create_user.assert_called_once_with(user_create)
