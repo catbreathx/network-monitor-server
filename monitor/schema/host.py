@@ -1,9 +1,9 @@
 import ipaddress
 
-from monitor.schema.base import BaseHotasModel
+from pydantic import BaseModel
 
 
-class BaseHost(BaseHotasModel):
+class BaseHost(BaseModel):
     name: str
     ip_address: ipaddress.IPv4Address
     enabled: bool = True
@@ -22,5 +22,12 @@ class HostCreate(BaseHost):
 
 
 class HostUpdate(Host):
+    class Config:
+        orm_mode = True
+
+
+class HostCreateOut(BaseModel):
+    id: int
+
     class Config:
         orm_mode = True

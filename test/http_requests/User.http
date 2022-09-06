@@ -1,0 +1,27 @@
+POST http://{{host}}/api/v1/user
+Content-Type: application/json
+
+{
+  "email": "stewart.hector@test.com",
+  "first_name": "stewart",
+  "last_name": "hector",
+  "password": "1password_!@#$123",
+  "confirm_password": "1password_!@#$123"
+}
+
+> {%
+client.test('Post was successful', () => {
+    client.assert(response.status === 201 );
+})
+
+%}
+
+###
+
+POST http://{{host}}/api/v1/login
+Content-Type: application/json
+
+{
+  "email": "stewart.hector@test.com",
+  "password": "21password_!@#$123"
+}

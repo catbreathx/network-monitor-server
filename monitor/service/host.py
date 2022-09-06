@@ -19,6 +19,7 @@ class HostService:
 
     def get_all(self) -> list[schema.Host]:
         hosts = self._host_repository.get_all(self._db)
+
         return hosts
 
     def create_host(self, host_create: schema.HostCreate) -> models.Host:

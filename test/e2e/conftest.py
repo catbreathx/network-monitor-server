@@ -3,21 +3,25 @@ import shlex
 import socket
 import subprocess
 import time
-from typing import Optional, Dict
 
 import alembic
+import pytest
 from _pytest.config import ExitCode
 from alembic.config import Config
-from dotenv import dotenv_values
+from sqlalchemy.orm import Session
+
+from monitor.database import db, models
+from monitor.database.db import initialize_database
+from monitor.settings import load_settings, app_settings
 
 PORT = 5002
 
 server_process: subprocess.Popen
-settings: Dict[str, Optional[str]]
 
 
 def pytest_configure(config):
     load_settings("e2e.env")
+    initialize_database()
     apply_migrations()
     global server_process
     check_port_is_unused(port=PORT)
@@ -32,11 +36,6 @@ def pytest_sessionfinish(session, exitstatus):
 
     if exitstatus == ExitCode.OK:
         teardown_migration()
-
-
-def load_settings(env_file: str):
-    global settings
-    settings = dotenv_values(env_file)
 
 
 def wait_for_server(server_process: subprocess.Popen) -> None:
@@ -96,11 +95,32 @@ def check_port_is_unused(port: int = PORT) -> None:
 def apply_migrations():
     os.environ["TEST"] = "True"
     config = Config("alembic.ini")
-    global settings
-    config.set_main_option("sqlalchemy.url", settings["DATABASE_URL"])
+    config.set_main_option("sqlalchemy.url", app_settings().database_url)
     alembic.command.upgrade(config, "head")
 
 
 def teardown_migration():
     config = Config("alembic.ini")
     alembic.command.downgrade(config, "base")
+
+
+@pytest.fixture(scope="module")
+def db_session() -> Session:
+    return db.get_session()
+
+
+@pytest.fixture(scope="module")
+def test_user(db_session: Session):
+    user = models.User(
+        first_name="test",
+        last_name="user",
+        email="test_user@email.com",
+        password="password",
+        enabled=True,
+        account_confirmed=True,
+    )
+
+    db_session.add(user)
+    db_session.commit()
+
+    return user

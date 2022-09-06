@@ -1,8 +1,10 @@
-import os
+import logging.config
 
-from monitor import settings
+import yaml
 
 
-def load_settings(env_file=None):
-    env_file = env_file or os.environ.get("ENV_FILE")
-    settings.load_settings(env_file)
+def initialize_logging():
+    with open("logging.yml", "r") as stream:
+        config = yaml.load(stream, Loader=yaml.FullLoader)
+
+    logging.config.dictConfig(config)

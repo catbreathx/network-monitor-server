@@ -7,7 +7,7 @@ from monitor import service
 from monitor.app import app
 from monitor.schema import UserCreate
 from monitor.service import UserService, create_user_service
-from test.unit.routes.base_test import BaseRouteTest
+from test.unit.route.base_test import BaseRouteTest
 
 POST_PATH = "/api/v1/user"
 
@@ -32,19 +32,19 @@ class BaseTestUser(BaseRouteTest):
             "email": "user@email.com",
             "first_name": "bob",
             "last_name": "silver",
-            "password": "password",
-            "confirm_password": "password",
+            "password": "password12!@#",
+            "confirm_password": "password12!@#",
         }
 
         return user
 
 
 class TestPostUser(BaseTestUser):
-    def test_success_and_return_200(self, test_client, post_payload):
+    def test_success_and_return_201(self, test_client, post_payload):
         user_create = UserCreate(**post_payload)
 
         response = test_client.post(POST_PATH, json=user_create.dict())
-        assert response.status_code == HTTPStatus.OK
+        assert response.status_code == HTTPStatus.CREATED
 
         self.mock_user_service.create_user.assert_called_once_with(user_create)
 

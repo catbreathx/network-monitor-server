@@ -1,7 +1,9 @@
 from passlib.context import CryptContext
 from sqlalchemy import Column, Integer, Boolean, UniqueConstraint, Text
+from sqlalchemy.orm import validates
 
 from monitor.database.db import Base
+from monitor.database.fields import Password
 
 password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -24,7 +26,7 @@ class User(Base):
     first_name = Column(Text, nullable=False)
     last_name = Column(Text, nullable=True)
     email = Column(Text, nullable=False)
-    password = Column(Text, nullable=False)
+    password = Column(Password, nullable=False)
     enabled = Column(Boolean, default=True, nullable=False)
     account_confirmed = Column(Boolean, default=False, nullable=False)
     password_change_token = Column(Text, nullable=True)
@@ -33,16 +35,8 @@ class User(Base):
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
 
-    def set_password(self, plain_password: str) -> None:
-        """
-        Hash + salt the plain text password and set the password attribute
-        :param plain_password: the plain text password
-        :return: None
-        """
-        hashed = password_context.hash(plain_password)
-
-        self.password = hashed
-
-    def verify_password(self, plain_password: str) -> bool:
-        result = password_context.verify(plain_password, self.password)
+    @validates("password")
+    def validate_password(self, key: str, password):
+        validator = getattr(type(self), key).type.validator
+        result = validator(password)
         return result

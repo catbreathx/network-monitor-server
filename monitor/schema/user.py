@@ -1,7 +1,8 @@
 from builtins import ValueError
-from typing import Union
 
 from pydantic import BaseModel, validator
+
+from monitor.schema.password_validator import PasswordValidator
 
 
 class BaseUser(BaseModel):
@@ -19,11 +20,18 @@ class UserCreate(BaseUser):
     confirm_password: str
 
     @validator("password")
-    def validate_password(cls, value: str, values: dict[str : Union[str, int, bool]]):
+    def validate_password(cls, value: str, values: dict[str:[str, int, bool]]):
+        validator = PasswordValidator()
+        validator.validate(value)
+        try:
+            validator.has_digits(2).has_length(10).has_letters(8).has_symbols(2)
+        except ValueError as e:
+            raise ValueError(e)
+
         return value
 
     @validator("confirm_password")
-    def passwords_match(cls, value: str, values: dict[str : Union[str, int, bool]]):
+    def passwords_match(cls, value: str, values: dict[str, [str, int, bool]]):
         password = values.get("password", "")
         if value != password:
             raise ValueError("Passwords do not match")
@@ -32,6 +40,7 @@ class UserCreate(BaseUser):
 
     class Config:
         orm_mode = True
+        exclude = {"confirm_password"}
 
 
 class PutUser(BaseModel):
@@ -42,6 +51,13 @@ class PutUser(BaseModel):
 class ChangePassword(BaseModel):
     password: str
     confirm_password: str
+
+    class Config:
+        orm_mode = True
+
+
+class UserCreateOut(BaseModel):
+    id: int
 
     class Config:
         orm_mode = True

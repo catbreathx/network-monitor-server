@@ -32,8 +32,8 @@ def upgrade() -> None:
         sa.Column("last_name", sa.Text(), nullable=True),
         sa.Column("email", sa.Text(), nullable=False),
         sa.Column("password", sa.Text(), nullable=False),
-        sa.Column("enabled", sa.Boolean(), nullable=False),
-        sa.Column("account_confirmed", sa.Boolean(), nullable=False),
+        sa.Column("enabled", sa.Boolean(), nullable=False, server_default="false"),
+        sa.Column("account_confirmed", sa.Boolean(), nullable=False, server_default="false"),
         sa.Column("password_change_token", sa.Text(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
     )

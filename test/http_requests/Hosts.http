@@ -1,0 +1,49 @@
+
+####
+
+POST http://{{host}}/api/v1/host
+Content-Type: application/json
+
+{
+  "name": "Kodi",
+  "ip_address": "192.168.0.99"
+}
+
+
+> {%
+
+client.test('Request executed successfully', () => {
+    client.assert(response.status === 201)
+});
+
+client.test('Host was created', () => {
+   const host = response.body
+   client.assert(host.id >= 1)
+});
+
+client.global.set('hostId', response.body.id)
+
+%}
+
+###
+
+GET http://{{host}}/api/v1/host/{{hostId}}
+Accept: application/json
+
+> {%
+   client.test('Request was successful', () => {
+       client.assert(response.status === 200);
+   })
+
+   client.test("Response is populated correctly", () => {
+       const expected = {
+                   "name": "Kodi",
+                    "ip_address": "192.168.0.99",
+                    "enabled": true,
+                    "id": 39
+       };
+       client.assert(response.body.name === expected.name);
+       client.assert(response.body.enabled === expected.enabled );
+       client.assert(response.body.ip_address === expected.ip_address );
+   })
+ %}

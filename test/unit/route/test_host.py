@@ -7,7 +7,7 @@ from monitor import service
 from monitor.app import app
 from monitor.database import models
 from monitor.service import create_host_service, HostService
-from test.unit.routes.base_test import BaseRouteTest
+from test.unit.route.base_test import BaseRouteTest
 from test.unit.utils import model_list_to_json, model_to_json
 
 GET_PATH = "/api/v1/host"
