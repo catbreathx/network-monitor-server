@@ -24,7 +24,7 @@ def create_exception_handlers(app: FastAPI):
 
     @app.exception_handler(exceptions.AuthenticationException)
     async def authentication_error_exception_handler(_, __):
-        return JSONResponse(status_code=HTTPStatus.FORBIDDEN, content={})
+        return JSONResponse(status_code=HTTPStatus.UNAUTHORIZED, content={})
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request, exc):

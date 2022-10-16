@@ -29,6 +29,7 @@ class UserCreate(BaseUser):
     def validate_password(cls, value: str, values: dict[str:[str, int, bool]]):
         validator = PasswordValidator()
         validator.validate(value)
+
         try:
             validator.has_digits(2).has_length(10).has_letters(8).has_symbols(2)
         except ValueError as e:

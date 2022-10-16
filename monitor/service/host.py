@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from monitor import schema
 from monitor.database import models
+from monitor.exceptions import ResourceNotFoundException
 from monitor.repository import get_db_session
 from monitor.repository.host import HostRepository
 
@@ -29,6 +30,17 @@ class HostService:
             raise e
 
         return host
+
+    def update_host(self, host_id: str, update_host: schema.HostUpdate) -> models.Host:
+        existing_host = self.get_one(host_id=host_id)
+
+        if existing_host is None:
+            raise ResourceNotFoundException(host_id, models.Host.__class__.__name__)
+
+        existing_host.update_from(update_host.dict())
+
+        self._host_repository.update_host(self._db, existing_host)
+        return existing_host
 
     def get_one(self, host_id: str) -> models.Host | None:
         host = self._host_repository.get_one(self._db, host_id)

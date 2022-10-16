@@ -7,7 +7,7 @@ from monitor.route import authorization
 from monitor.service import create_host_service
 
 router = APIRouter(
-    prefix="/api/v1/host",
+    prefix="/api/v1/hosts",
 )
 
 
@@ -52,3 +52,18 @@ def create_host(
 ):
     new_host = host_service.create_host(host_create)
     return new_host
+
+
+@router.put(
+    "/{host_id}",
+    status_code=HTTPStatus.OK,
+    response_model=schema.HostCreateOut,
+    dependencies=[Depends(authorization.set_current_user_in_context)],
+)
+def update_host(
+    host_id: str,
+    host_update: schema.HostUpdate,
+    host_service: service.HostService = Depends(create_host_service),
+):
+    updated_host = host_service.update_host(host_id, host_update)
+    return updated_host

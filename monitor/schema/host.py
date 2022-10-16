@@ -21,7 +21,7 @@ class HostCreate(BaseHost):
         orm_mode = True
 
 
-class HostUpdate(Host):
+class HostUpdate(BaseHost):
     class Config:
         orm_mode = True
 

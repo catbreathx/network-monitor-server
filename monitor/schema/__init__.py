@@ -1,6 +1,7 @@
 from .base import BaseHotasModel
 from .host import Host
 from .host import HostCreate
+from .host import HostUpdate
 from .host import HostCreateOut
 from .login import Credentials
 from .user import PutUser

@@ -1,18 +1,19 @@
+import json
 from http import HTTPStatus
 from unittest.mock import create_autospec
 
 import pytest
 from starlette_context import context
 
-from monitor import service
+from monitor import service, schema
 from monitor.app import app
 from monitor.database import models
 from monitor.route import authorization
 from monitor.service import create_host_service, HostService
 from test.unit.route.base_test import BaseRouteTest
-from test.unit.utils import model_list_to_json, model_to_json
+from utils import model_list_to_json
 
-GET_PATH = "/api/v1/host"
+GET_PATH = "/api/v1/hosts"
 
 
 class BaseTestHost(BaseRouteTest):
@@ -69,8 +70,8 @@ class TestGetAllHost(BaseTestHost):
         response = test_client.get(GET_PATH)
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
-    def test_return_forbidden_when_user_is_not_valid(self, test_client, host_data):
-        self._test_return_forbidden_when_user_is_not_valid(test_client, path=GET_PATH)
+    def test_return_authorized_when_user_is_not_valid(self, test_client, host_data):
+        self._test_return_unauthorized_when_user_is_not_valid(test_client, path=GET_PATH)
 
 
 class TestGetOneHost(BaseTestHost):
@@ -80,10 +81,8 @@ class TestGetOneHost(BaseTestHost):
         resource_id = "1"
         response = test_client.get(f"{GET_PATH}/{resource_id}")
 
-        expect = model_to_json(host_data[0])
-
         assert response.status_code == HTTPStatus.OK
-        assert response.json() == expect
+        assert response.json() == host_data[0].json()
 
     def test_when_resource_not_found_and_return_404(self, test_client, host_data):
         self.mock_host_service.get_one.return_value = None
@@ -100,5 +99,24 @@ class TestGetOneHost(BaseTestHost):
         assert response.status_code == HTTPStatus.NOT_FOUND
         assert response.json() == expected_response
 
-    def test_return_forbidden_when_user_is_not_valid(self, test_client, host_data):
-        self._test_return_forbidden_when_user_is_not_valid(test_client, path=f"{GET_PATH}/1")
+    def test_return_unauthorized_when_user_is_not_valid(self, test_client, host_data):
+        self._test_return_unauthorized_when_user_is_not_valid(test_client, path=f"{GET_PATH}/1")
+
+
+class TestUpdateHost(BaseTestHost):
+    def test_when_resource_exists_and_return_200(self, test_client):
+        resource_id = 1
+
+        host_update = schema.HostUpdate(
+            **{"name": "Pi", "ip_address": "192.168.0.2", "enabled": True}
+        )
+        host_data = host_update.dict()
+        host_data["id"] = resource_id
+
+        host = models.Host(**host_data)
+
+        self.mock_host_service.get_one.return_value = host
+        response = test_client.put(f"{GET_PATH}/{resource_id}", json=json.loads(host_update.json()))
+
+        assert response.status_code == HTTPStatus.OK
+        assert response.json() == {"id": 1}

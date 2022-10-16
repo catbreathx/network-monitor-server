@@ -2,7 +2,7 @@ import json
 
 from sqlalchemy.orm import DeclarativeMeta
 
-from monitor.database.db import Base
+from monitor.database.models import AbstractBaseModel
 
 
 class AlchemyEncoder(json.JSONEncoder):
@@ -26,11 +26,6 @@ class AlchemyEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def model_list_to_json(models: list[Base]) -> list[dict]:
-    result = [json.loads(json.dumps(model, cls=AlchemyEncoder)) for model in models]
-    return result
-
-
-def model_to_json(model: Base) -> list[dict]:
-    result = json.loads(json.dumps(model, cls=AlchemyEncoder))
+def model_list_to_json(models: list[AbstractBaseModel]) -> list[dict]:
+    result = [model.json() for model in models]
     return result

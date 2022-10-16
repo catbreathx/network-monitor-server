@@ -33,11 +33,11 @@ class BaseRouteTest:
 
         return client
 
-    def _test_return_forbidden_when_user_is_not_valid(
+    def _test_return_unauthorized_when_user_is_not_valid(
         self, test_client: TestClient, method: str = "GET", path: str = None
     ):
         self.mock_set_current_user_in_context.side_effect = exceptions.AuthenticationException(
             "test"
         )
         response = test_client.request(method, path)
-        assert response.status_code == HTTPStatus.FORBIDDEN
+        assert response.status_code == HTTPStatus.UNAUTHORIZED

@@ -43,6 +43,10 @@ def get_user_from_jwt_token(
     try:
         public_key_bytes = base64.b64decode(public_key)
         payload = jwt.decode(jwt_token, public_key_bytes.decode("ascii"), algorithms=algorithms)
+
+        if payload.get("id", None) is None:
+            raise AuthenticationException("Unauthorized")
+
         user = JwtUser(id=payload["id"], email=payload["email"])
 
     except JWTError as e:

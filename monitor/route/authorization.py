@@ -18,6 +18,9 @@ def verify_token(
     user = jwt.get_user_from_jwt_token(header.credentials, jwt_key, algorithm)
     db_user = user_service.get_user_by_id(user.id)
 
+    if db_user is None:
+        raise exceptions.AuthenticationException("User is not authenticated")
+
     if db_user.is_active is False:
         raise exceptions.AuthenticationException("User is not authenticated")
 

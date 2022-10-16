@@ -1,7 +1,7 @@
 
 ####
 
-POST http://{{host}}/api/v1/host
+POST http://{{host}}/api/v1/hosts
 Content-Type: application/json
 
 {
@@ -27,7 +27,7 @@ client.global.set('hostId', response.body.id)
 
 ###
 
-GET http://{{host}}/api/v1/host/{{hostId}}
+GET http://{{host}}/api/v1/hosts/{{hostId}}
 Accept: application/json
 
 > {%

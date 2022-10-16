@@ -71,5 +71,5 @@ class TestPostUser(BaseTestUser):
 
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
-    def test_return_forbidden_when_user_is_not_valid(self, test_client):
-        self._test_return_forbidden_when_user_is_not_valid(test_client, "POST", f"{POST_PATH}")
+    def test_return_unauthorized_when_user_is_not_valid(self, test_client):
+        self._test_return_unauthorized_when_user_is_not_valid(test_client, "POST", f"{POST_PATH}")
