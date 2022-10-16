@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
@@ -32,7 +30,7 @@ class HostService:
 
         return host
 
-    def get_one(self, host_id: str) -> Optional[models.Host]:
+    def get_one(self, host_id: str) -> models.Host | None:
         host = self._host_repository.get_one(self._db, host_id)
         return host
 

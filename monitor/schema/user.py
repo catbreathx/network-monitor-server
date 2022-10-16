@@ -1,6 +1,7 @@
+import typing
 from builtins import ValueError
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, root_validator
 
 from monitor.schema.password_validator import PasswordValidator
 
@@ -9,6 +10,11 @@ class BaseUser(BaseModel):
     email: str
     first_name: str
     last_name: str
+
+    @root_validator
+    def normalize_values(cls, values: typing.Dict) -> typing.Dict:
+        values["email"]: str = values["email"].lower()
+        return values
 
 
 class User(BaseUser):

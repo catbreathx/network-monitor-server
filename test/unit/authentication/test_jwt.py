@@ -1,10 +1,14 @@
-import pytest
+import base64
 
-from monitor.authentication.jwt import create_jwt_token, decode_jwt_token
+import pytest
+from jose.constants import ALGORITHMS
+
+from monitor.authentication.jwt import create_jwt_token, get_user_from_jwt_token, ALGORITHM
 from monitor.database.models import User
 from monitor.exceptions.exceptions import AuthenticationException
+from monitor.settings import app_settings
 
-SECRET_KEY = " 09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7"
+ONE_MINUTE = 1
 
 
 class TestCreateJwtToken:
@@ -14,25 +18,42 @@ class TestCreateJwtToken:
         return user
 
     def test_token_will_be_created_successfully(self, user):
-        jwt_token = create_jwt_token(user, 1, SECRET_KEY)
+        jwt_token = create_jwt_token(
+            user, ONE_MINUTE, app_settings().jwt_private_key.get_secret_value(), algorithm=ALGORITHM
+        )
 
         assert jwt_token is not None
 
-        actual_user = decode_jwt_token(jwt_token, secret_key=SECRET_KEY)
+        actual_user = get_user_from_jwt_token(
+            jwt_token, public_key=app_settings().jwt_public_key, algorithms=ALGORITHM
+        )
 
         assert user.id == actual_user.id
         assert user.email == actual_user.email
 
     def test_exception_thrown_when_token_fails_to_decode(self, user):
-        jwt_token = create_jwt_token(user, 1, SECRET_KEY)
+        secret_key = base64.b64encode(str.encode("secret_key")).decode("utf-8")
+        public_key = base64.b64encode(str.encode("public_key")).decode("utf-8")
+
+        jwt_token = create_jwt_token(user, ONE_MINUTE, secret_key, algorithm=ALGORITHMS.HS256)
 
         with pytest.raises(AuthenticationException):
-            decode_jwt_token(jwt_token, secret_key="abc")
+            get_user_from_jwt_token(jwt_token, public_key=public_key, algorithms=ALGORITHMS.HS256)
 
     def test_expiration_is_populated_correctly_and_will_not_decode_when_expired(self, user):
-        jwt_token = create_jwt_token(user, -1, SECRET_KEY)
+        jwt_token = create_jwt_token(
+            user, -1, app_settings().jwt_private_key.get_secret_value(), algorithm=ALGORITHM
+        )
 
         with pytest.raises(AuthenticationException) as e:
-            decode_jwt_token(jwt_token, secret_key=SECRET_KEY)
+            get_user_from_jwt_token(
+                jwt_token, public_key=app_settings().jwt_public_key, algorithms=ALGORITHM
+            )
 
         assert str(e.value) == "Signature has expired."
+
+
+def decode_base64_to_str(base64_secret: str) -> str:
+    key = base64.b64decode(base64_secret)
+    result = key.decode("ascii")
+    return result

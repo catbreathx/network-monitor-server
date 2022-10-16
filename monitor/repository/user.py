@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from monitor import schema
 from monitor.database import models
+from monitor.exceptions.exceptions import DuplicateUser
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +18,11 @@ class UserRepository:
         return hosts
 
     def create_user(self, session: Session, user_create: schema.user.UserCreate) -> models.User:
+        existing_user = self.get_by_email(session, user_create.email)
+
+        if existing_user:
+            raise DuplicateUser(user_create.email)
+
         user = models.User(**user_create.dict(exclude={"confirm_password"}))
         session.add(user)
 

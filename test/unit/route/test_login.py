@@ -36,5 +36,7 @@ class TestLogin(BaseLoginTest):
         actual_response = test_client.post(POST_PATH, json=credentials.dict())
 
         assert actual_response.status_code == HTTPStatus.OK
-        actual_headers = actual_response.headers
-        assert actual_headers["Authorization"].startswith("Bearer ey")
+        json = actual_response.json()
+
+        assert json["access_token"].startswith("ey")
+        assert json["refresh_token"].startswith("ey")

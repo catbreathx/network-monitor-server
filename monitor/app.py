@@ -1,6 +1,8 @@
 import os
 
 from fastapi import FastAPI
+from starlette.middleware import Middleware
+from starlette_context.middleware import RawContextMiddleware
 
 from monitor import route, middleware, initialize_logging, schema
 from monitor.database.db import initialize_database
@@ -8,6 +10,12 @@ from monitor.route import create_exception_handlers
 from monitor.settings import load_settings
 
 app: FastAPI
+
+starlette_middleware = [
+    Middleware(
+        RawContextMiddleware,
+    )
+]
 
 
 def bootstrap():
@@ -18,7 +26,7 @@ def bootstrap():
         initialize_database()
 
         global app
-        app = FastAPI()
+        app = FastAPI(middleware=starlette_middleware)
         schema.init_schema(app)
 
         middleware.add_middleware(app)

@@ -2,9 +2,12 @@ from http import HTTPStatus
 from unittest.mock import create_autospec
 
 import pytest
+from starlette_context import context
 
 from monitor import service
 from monitor.app import app
+from monitor.database import models
+from monitor.route import authorization
 from monitor.schema import UserCreate
 from monitor.service import UserService, create_user_service
 from test.unit.route.base_test import BaseRouteTest
@@ -14,6 +17,7 @@ POST_PATH = "/api/v1/user"
 
 class BaseTestUser(BaseRouteTest):
     mock_user_service = None
+    mock_set_current_user_in_context = None
 
     @pytest.fixture(autouse=True)
     def setup_test(self):
@@ -21,6 +25,19 @@ class BaseTestUser(BaseRouteTest):
         mock_create_user_service = create_autospec(
             create_user_service, return_value=self.mock_user_service
         )
+        self.mock_set_current_user_in_context = create_autospec(
+            authorization.set_current_user_in_context
+        )
+
+        user = models.User(id=1, email="user@mail.com")
+        self.mock_set_current_user_in_context.return_value = user
+
+        def set_current_user_in_context():
+            context.data["user"] = self.mock_set_current_user_in_context()
+
+        app.dependency_overrides[
+            authorization.set_current_user_in_context
+        ] = set_current_user_in_context
 
         app.dependency_overrides[service.create_user_service] = mock_create_user_service
 
@@ -53,3 +70,6 @@ class TestPostUser(BaseTestUser):
         response = test_client.post(POST_PATH, json=post_payload)
 
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
+
+    def test_return_forbidden_when_user_is_not_valid(self, test_client):
+        self._test_return_forbidden_when_user_is_not_valid(test_client, "POST", f"{POST_PATH}")

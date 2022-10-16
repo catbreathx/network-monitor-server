@@ -18,3 +18,18 @@ class ResourceNotFoundException(Exception):
 
 class AuthenticationException(Exception):
     pass
+
+
+class DuplicateUser(Exception):
+    _email = None
+
+    @property
+    def email(self):
+        return self._email
+
+    def __init__(self, email: str) -> None:
+        super().__init__()
+        self._email = email
+
+    def __str__(self) -> str:
+        return f"User with {self._email} already exists"

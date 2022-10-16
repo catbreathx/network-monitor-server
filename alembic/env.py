@@ -65,6 +65,7 @@ def run_migrations_online() -> None:
     """
 
     alembic_config = config.get_section(config.config_ini_section)
+
     is_testing = os.environ.get("TEST")
 
     if is_testing:

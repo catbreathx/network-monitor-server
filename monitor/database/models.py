@@ -40,3 +40,8 @@ class User(Base):
         validator = getattr(type(self), key).type.validator
         result = validator(password)
         return result
+
+    @property
+    def is_active(self) -> bool:
+        active = self.account_confirmed is True and self.enabled is True
+        return active

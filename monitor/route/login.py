@@ -2,10 +2,10 @@ import logging
 from http import HTTPStatus
 
 from fastapi import APIRouter, Depends, HTTPException
-from starlette.responses import JSONResponse
+from starlette.responses import HTMLResponse, RedirectResponse
 
 from monitor import schema, service
-from monitor.route import jwt_utils
+from monitor.authentication import jwt
 from monitor.settings import app_settings
 
 router = APIRouter(
@@ -26,12 +26,23 @@ def login(
     if user is None:
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED)
 
-    jwt_token = jwt_utils.create_access_token(
-        user.email,
+    private_key = app_settings().jwt_private_key.get_secret_value()
+
+    jwt_token = jwt.create_jwt_token(
+        user,
         app_settings().jwt_token_expiration_minutes,
         app_settings().jwt_private_key.get_secret_value(),
+        app_settings().jwt_algorithm,
     )
 
-    headers = {"Authorization": f"Bearer {jwt_token}"}
+    refresh_token = jwt.create_refresh_token(
+        user.email, secret_key=private_key, algorithm=app_settings().jwt_algorithm
+    )
 
-    return JSONResponse(content={}, headers=headers)
+    return {"access_token": jwt_token, "refresh_token": refresh_token}
+
+
+@router.get("", status_code=HTTPStatus.OK, response_class=HTMLResponse)
+def logout():
+    response = RedirectResponse(url="/")
+    return response

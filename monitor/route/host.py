@@ -3,8 +3,7 @@ from http import HTTPStatus
 from fastapi import Depends, APIRouter
 
 from monitor import schema, exceptions, service
-from monitor.database.models import Host
-from monitor.route.permissions import verify_jwt_token
+from monitor.route import authorization
 from monitor.service import create_host_service
 
 router = APIRouter(
@@ -12,12 +11,15 @@ router = APIRouter(
 )
 
 
-@router.get("/{host_id}", response_model=schema.Host, dependencies=[Depends(verify_jwt_token)])
+@router.get(
+    "/{host_id}",
+    response_model=schema.Host,
+    dependencies=[Depends(authorization.set_current_user_in_context)],
+)
 def get_one_host(
-    host_id: str,
-    host_service: service.HostService = Depends(service.create_host_service),
+    host_id: str, host_service: service.HostService = Depends(service.create_host_service)
 ):
-    host: Host | None = host_service.get_one(host_id)
+    host = host_service.get_one(host_id)
 
     if host is None:
         raise exceptions.ResourceNotFoundException(host_id, "host")
@@ -25,13 +27,25 @@ def get_one_host(
     return host
 
 
-@router.get("", response_model=list[schema.Host], status_code=HTTPStatus.OK)
-def get_hosts(host_service: service.HostService = Depends(service.create_host_service)):
+@router.get(
+    "",
+    response_model=list[schema.Host],
+    status_code=HTTPStatus.OK,
+    dependencies=[Depends(authorization.set_current_user_in_context)],
+)
+def get_hosts(
+    host_service: service.HostService = Depends(service.create_host_service),
+):
     hosts = host_service.get_all()
     return hosts
 
 
-@router.post("", status_code=HTTPStatus.CREATED, response_model=schema.HostCreateOut)
+@router.post(
+    "",
+    status_code=HTTPStatus.CREATED,
+    response_model=schema.HostCreateOut,
+    dependencies=[Depends(authorization.set_current_user_in_context)],
+)
 def create_host(
     host_create: schema.HostCreate,
     host_service: service.HostService = Depends(create_host_service),

@@ -27,7 +27,11 @@ def pytest_configure(config):
     check_port_is_unused(port=PORT)
     server_process = start_server()
 
-    wait_for_server(server_process)
+    try:
+        wait_for_server(server_process)
+    except Exception:
+        out, err = server_process.communicate()
+        print(err)
 
 
 def pytest_sessionfinish(session, exitstatus):
@@ -123,4 +127,7 @@ def test_user(db_session: Session):
     db_session.add(user)
     db_session.commit()
 
-    return user
+    yield user
+
+    db_session.delete(user)
+    db_session.commit()
