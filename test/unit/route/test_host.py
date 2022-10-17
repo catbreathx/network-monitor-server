@@ -13,7 +13,7 @@ from monitor.service import create_host_service, HostService
 from test.unit.route.base_test import BaseRouteTest
 from utils import model_list_to_json
 
-GET_PATH = "/api/v1/hosts"
+HOST_BASE_PATH = "/api/v1/hosts"
 
 
 class BaseTestHost(BaseRouteTest):
@@ -59,7 +59,7 @@ class TestGetAllHost(BaseTestHost):
     def test_success_and_return_200(self, test_client, host_data):
         self.mock_host_service.get_all.return_value = host_data
 
-        response = test_client.get(GET_PATH)
+        response = test_client.get(HOST_BASE_PATH)
         assert response.status_code == HTTPStatus.OK
 
         expected = model_list_to_json(host_data)
@@ -67,11 +67,11 @@ class TestGetAllHost(BaseTestHost):
 
     def test_raise_exception_and_then_expect_500_exception(self, test_client):
         self.mock_host_service.get_all.side_effect = Exception("test exception")
-        response = test_client.get(GET_PATH)
+        response = test_client.get(HOST_BASE_PATH)
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
     def test_return_authorized_when_user_is_not_valid(self, test_client, host_data):
-        self._test_return_unauthorized_when_user_is_not_valid(test_client, path=GET_PATH)
+        self._test_return_unauthorized_when_user_is_not_valid(test_client, path=HOST_BASE_PATH)
 
 
 class TestGetOneHost(BaseTestHost):
@@ -79,7 +79,7 @@ class TestGetOneHost(BaseTestHost):
         self.mock_host_service.get_one.return_value = host_data[0]
 
         resource_id = "1"
-        response = test_client.get(f"{GET_PATH}/{resource_id}")
+        response = test_client.get(f"{HOST_BASE_PATH}/{resource_id}")
 
         assert response.status_code == HTTPStatus.OK
         assert response.json() == host_data[0].json()
@@ -88,7 +88,7 @@ class TestGetOneHost(BaseTestHost):
         self.mock_host_service.get_one.return_value = None
 
         resource_id = "1"
-        response = test_client.get(f"{GET_PATH}/{resource_id}")
+        response = test_client.get(f"{HOST_BASE_PATH}/{resource_id}")
 
         expected_response = {
             "message": "Resource Not Found",
@@ -100,7 +100,9 @@ class TestGetOneHost(BaseTestHost):
         assert response.json() == expected_response
 
     def test_return_unauthorized_when_user_is_not_valid(self, test_client, host_data):
-        self._test_return_unauthorized_when_user_is_not_valid(test_client, path=f"{GET_PATH}/1")
+        self._test_return_unauthorized_when_user_is_not_valid(
+            test_client, path=f"{HOST_BASE_PATH}/1"
+        )
 
 
 class TestUpdateHost(BaseTestHost):
@@ -116,7 +118,9 @@ class TestUpdateHost(BaseTestHost):
         host = models.Host(**host_data)
 
         self.mock_host_service.get_one.return_value = host
-        response = test_client.put(f"{GET_PATH}/{resource_id}", json=json.loads(host_update.json()))
+        response = test_client.put(
+            f"{HOST_BASE_PATH}/{resource_id}", json=json.loads(host_update.json())
+        )
 
         assert response.status_code == HTTPStatus.OK
         assert response.json() == {"id": 1}

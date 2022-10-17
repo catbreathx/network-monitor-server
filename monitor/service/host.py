@@ -40,6 +40,7 @@ class HostService:
         existing_host.update_from(update_host.dict())
 
         self._host_repository.update_host(self._db, existing_host)
+
         return existing_host
 
     def get_one(self, host_id: str) -> models.Host | None:

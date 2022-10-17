@@ -68,3 +68,10 @@ class UserCreateOut(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class UserGetOut(User):
+    id: int
+
+    class Config:
+        orm_mode = True

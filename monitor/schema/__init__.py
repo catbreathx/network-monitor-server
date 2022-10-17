@@ -8,6 +8,7 @@ from .user import PutUser
 from .user import User
 from .user import UserCreate
 from .user import UserCreateOut
+from .user import UserGetOut
 
 
 def init_schema(app):
