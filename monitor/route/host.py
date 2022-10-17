@@ -61,7 +61,7 @@ def create_host(
     dependencies=[Depends(authorization.set_current_user_in_context)],
 )
 def update_host(
-    host_id: str,
+    host_id: int,
     host_update: schema.HostUpdate,
     host_service: service.HostService = Depends(create_host_service),
 ):

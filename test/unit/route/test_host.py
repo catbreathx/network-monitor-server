@@ -63,11 +63,14 @@ class TestGetAllHost(BaseTestHost):
         assert response.status_code == HTTPStatus.OK
 
         expected = model_list_to_json(host_data)
+
         assert response.json() == expected
+        self.mock_host_service.get_all.assert_called_once_with()
 
     def test_raise_exception_and_then_expect_500_exception(self, test_client):
         self.mock_host_service.get_all.side_effect = Exception("test exception")
         response = test_client.get(HOST_BASE_PATH)
+
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR
 
     def test_return_authorized_when_user_is_not_valid(self, test_client, host_data):
@@ -83,6 +86,8 @@ class TestGetOneHost(BaseTestHost):
 
         assert response.status_code == HTTPStatus.OK
         assert response.json() == host_data[0].json()
+
+        self.mock_host_service.get_one.assert_called_once_with(resource_id)
 
     def test_when_resource_not_found_and_return_404(self, test_client, host_data):
         self.mock_host_service.get_one.return_value = None
@@ -117,10 +122,12 @@ class TestUpdateHost(BaseTestHost):
 
         host = models.Host(**host_data)
 
-        self.mock_host_service.get_one.return_value = host
+        self.mock_host_service.update_host.return_value = host
         response = test_client.put(
             f"{HOST_BASE_PATH}/{resource_id}", json=json.loads(host_update.json())
         )
 
         assert response.status_code == HTTPStatus.OK
-        assert response.json() == {"id": 1}
+        assert response.json() == {"id": resource_id}
+
+        self.mock_host_service.update_host.assert_called_once_with(resource_id, host_update)

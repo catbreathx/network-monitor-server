@@ -40,3 +40,5 @@ class TestLogin(BaseLoginTest):
 
         assert json["access_token"].startswith("ey")
         assert json["refresh_token"].startswith("ey")
+
+        self.mock_login_service.authenticate_login.assert_called_once_with(credentials)
