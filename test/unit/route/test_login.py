@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from unittest import mock
 from unittest.mock import create_autospec
 
 import pytest
@@ -17,7 +18,7 @@ class BaseLoginTest(BaseRouteTest):
 
     @pytest.fixture(autouse=True)
     def setup_test(self):
-        self.mock_login_service = create_autospec(LoginService)
+        self.mock_login_service: mock.Mock = create_autospec(LoginService)
         mock_create_login_service = create_autospec(
             create_login_service, return_value=self.mock_login_service
         )
