@@ -79,6 +79,14 @@ class TestPostUser(BaseTestUser):
 
         self.mock_user_service.create_user.assert_called_once_with(user_create)
 
+    def test_when_user_fails_validation(self, test_client, post_payload):
+        user_create = UserCreate(**post_payload)
+        user_create.password = "another_password"
+
+        response = test_client.post(USER_BASE_PATH, json=user_create.dict())
+        assert response.status_code == HTTPStatus.BAD_REQUEST
+        assert response.json()["detail"][1]["msg"] == "Passwords do not match"
+
     def test_when_exception_thrown_and_expect_500_exception(self, test_client, post_payload):
         self.mock_user_service.create_user.side_effect = Exception("test exception")
         response = test_client.post(USER_BASE_PATH, json=post_payload)
