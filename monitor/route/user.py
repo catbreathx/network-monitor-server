@@ -6,7 +6,7 @@ from monitor import schema, service
 from monitor.route import authorization
 
 router = APIRouter(
-    prefix="/api/v1/user",
+    prefix="/api/v1/users",
 )
 
 

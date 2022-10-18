@@ -12,7 +12,7 @@ from monitor.schema import UserCreate
 from monitor.service import UserService, create_user_service
 from test.unit.route.base_test import BaseRouteTest
 
-USER_BASE_PATH = "/api/v1/user"
+USER_BASE_PATH = "/api/v1/users"
 
 
 class BaseTestUser(BaseRouteTest):

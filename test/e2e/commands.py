@@ -17,7 +17,7 @@ def login(email: str, password: str) -> Response:
 
 def create_user(user_create: schema.UserCreate, access_token: str) -> Response:
     json = jsonable_encoder(user_create.dict())
-    response = requests.post(_get_url("/user"), json=json, auth=JWTAuth(access_token))
+    response = requests.post(_get_url("/users"), json=json, auth=JWTAuth(access_token))
 
     return response
 
