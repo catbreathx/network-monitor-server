@@ -3,6 +3,7 @@ import shlex
 import socket
 import subprocess
 import time
+from typing import Dict, Generator
 
 import alembic
 import pytest
@@ -114,7 +115,7 @@ def db_session() -> Session:
 
 
 @pytest.fixture(scope="module")
-def test_user(db_session: Session):
+def test_user(db_session: Session) -> Generator[Dict, None, None]:
     user = models.User(
         first_name="test",
         last_name="user",

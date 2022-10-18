@@ -1,15 +1,8 @@
 from http import HTTPStatus
 
-import pytest
-
 from e2e import commands, utils
 from monitor import schema
 from monitor.schema import UserCreate
-
-
-@pytest.fixture(autouse=True)
-def setup_test_user(test_user):
-    pass
 
 
 class TestUserFlow:

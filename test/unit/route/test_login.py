@@ -1,8 +1,10 @@
 from http import HTTPStatus
+from typing import Generator
 from unittest import mock
 from unittest.mock import create_autospec
 
 import pytest
+from starlette.testclient import TestClient
 
 from monitor import schema, service
 from monitor.app import app
@@ -17,7 +19,7 @@ class BaseLoginTest(BaseRouteTest):
     mock_login_service: LoginService
 
     @pytest.fixture(autouse=True)
-    def setup_test(self):
+    def setup_test(self) -> Generator[None, None, None]:
         self.mock_login_service: mock.Mock = create_autospec(LoginService)
         mock_create_login_service = create_autospec(
             create_login_service, return_value=self.mock_login_service
@@ -29,7 +31,9 @@ class BaseLoginTest(BaseRouteTest):
 
 
 class TestLogin(BaseLoginTest):
-    def test_login_successfully_and_expect_jwt_authorization_in_header(self, test_client):
+    def test_login_successfully_and_expect_jwt_authorization_in_header(
+        self, test_client: TestClient
+    ):
         user = models.User(email="someone@email.com")
         self.mock_login_service.authenticate_login.return_value = user
 

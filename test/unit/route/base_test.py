@@ -17,7 +17,7 @@ class BaseRouteTest:
     mock_set_current_user_in_context: authorization.set_current_user_in_context = None
 
     @pytest.fixture(autouse=True)
-    def setup_test(self):
+    def setup_test(self) -> None:
         mock_session = create_autospec(Session)
         mock_create_host_service = create_autospec(get_db_session, return_value=mock_session)
 
@@ -28,9 +28,8 @@ class BaseRouteTest:
         app.dependency_overrides[set_current_user_in_context] = mock_get_current_user
 
     @pytest.fixture(autouse=True)
-    def test_client(self):
+    def test_client(self) -> TestClient:
         client = TestClient(app)
-
         return client
 
     def _test_return_unauthorized_when_user_is_not_valid(

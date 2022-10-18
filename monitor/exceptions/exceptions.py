@@ -21,7 +21,7 @@ class AuthenticationException(Exception):
 
 
 class DuplicateUser(Exception):
-    _email = None
+    _email: str = None
 
     @property
     def email(self):
