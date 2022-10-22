@@ -36,7 +36,7 @@ jobs:
         run: poetry install
 
       - name: Run Unit Tests
-        run: poetry pytest tests/test/unit
+        run: poetry run pytest tests/test/unit
 
       - name: Run e2e Tests
-        run: poetry pytest tests/test/e2e
+        run: poetry run pytest tests/test/e2e
