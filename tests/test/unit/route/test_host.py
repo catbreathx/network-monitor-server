@@ -1,6 +1,7 @@
 import json
 from http import HTTPStatus
 from typing import List
+from unittest import mock
 from unittest.mock import create_autospec
 
 import pytest
@@ -8,18 +9,17 @@ from starlette.testclient import TestClient
 from starlette_context import context
 
 from monitor import service, schema
-from monitor.app import app
+from monitor.app import app_instance
 from monitor.database import models
 from monitor.route import authorization
-from monitor.service import create_host_service, HostService
 from test.unit.route.base_test import BaseRouteTest
-from utils import model_list_to_json
+from test.utils import model_list_to_json
 
 HOST_BASE_PATH = "/api/v1/hosts"
 
 
 class BaseTestHost(BaseRouteTest):
-    mock_host_service: HostService = None
+    mock_host_service: service.HostService = None
 
     @pytest.fixture
     def host_data(self) -> List[models.Host]:
@@ -34,13 +34,13 @@ class BaseTestHost(BaseRouteTest):
 
     @pytest.fixture(autouse=True)
     def setup_test(self) -> None:
-        self.mock_host_service = create_autospec(HostService)
+        self.mock_host_service: mock.Mock = create_autospec(service.HostService)
         self.mock_set_current_user_in_context = create_autospec(
             authorization.set_current_user_in_context
         )
 
         mock_create_host_service = create_autospec(
-            create_host_service, spec_set=True, return_value=self.mock_host_service
+            service.create_host_service, spec_set=True, return_value=self.mock_host_service
         )
 
         user = models.User(id=1, email="user@mail.com")
@@ -49,8 +49,8 @@ class BaseTestHost(BaseRouteTest):
         def set_current_user_in_context():
             context.data["user"] = self.mock_set_current_user_in_context()
 
-        app.dependency_overrides[service.create_host_service] = mock_create_host_service
-        app.dependency_overrides[
+        app_instance.dependency_overrides[service.create_host_service] = mock_create_host_service
+        app_instance.dependency_overrides[
             authorization.set_current_user_in_context
         ] = set_current_user_in_context
 
@@ -70,7 +70,7 @@ class TestGetAllHost(BaseTestHost):
         self.mock_host_service.get_all.assert_called_once_with()
 
     def test_raise_exception_and_then_expect_500_exception(self, test_client: TestClient):
-        self.mock_host_service.get_all.side_effect = Exception("test exception")
+        self.mock_host_service.get_all.side_effect = Exception("tests exception")
         response = test_client.get(HOST_BASE_PATH)
 
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR

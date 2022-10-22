@@ -3,10 +3,10 @@ import base64
 import pytest
 from jose.constants import ALGORITHMS
 
-from monitor.authentication.jwt import create_jwt_token, get_user_from_jwt_token, ALGORITHM
+from monitor.authentication.jwt import create_jwt_token, ALGORITHM, get_user_from_jwt_token
 from monitor.database import models
 from monitor.database.models import User
-from monitor.exceptions.exceptions import AuthenticationException
+from monitor.exceptions import AuthenticationException
 from monitor.settings import app_settings
 
 ONE_MINUTE = 1

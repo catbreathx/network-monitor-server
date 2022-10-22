@@ -1,8 +1,7 @@
 from http import HTTPStatus
 
-from e2e import commands, utils
+from test.e2e import commands, utils
 from monitor import schema
-from monitor.schema import UserCreate
 
 
 class TestUserFlow:
@@ -18,7 +17,7 @@ class TestUserFlow:
             "confirm_password": "password12!@#",
         }
 
-        user_create = UserCreate(**payload)
+        user_create = schema.UserCreate(**payload)
 
         response = commands.create_user(user_create, access_token)
 

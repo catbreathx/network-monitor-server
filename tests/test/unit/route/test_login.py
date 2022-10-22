@@ -7,25 +7,24 @@ import pytest
 from starlette.testclient import TestClient
 
 from monitor import schema, service
-from monitor.app import app
+from monitor.app import app_instance
 from monitor.database import models
-from monitor.service import LoginService, create_login_service
-from unit.route.base_test import BaseRouteTest
+from test.unit.route.base_test import BaseRouteTest
 
 POST_PATH = "/api/v1/login"
 
 
 class BaseLoginTest(BaseRouteTest):
-    mock_login_service: LoginService
+    mock_login_service: service.LoginService
 
     @pytest.fixture(autouse=True)
     def setup_test(self) -> Generator[None, None, None]:
-        self.mock_login_service: mock.Mock = create_autospec(LoginService)
+        self.mock_login_service: mock.Mock = create_autospec(service.LoginService)
         mock_create_login_service = create_autospec(
-            create_login_service, return_value=self.mock_login_service
+            service.create_login_service, return_value=self.mock_login_service
         )
 
-        app.dependency_overrides[service.create_login_service] = mock_create_login_service
+        app_instance.dependency_overrides[service.create_login_service] = mock_create_login_service
 
         yield
 
@@ -37,7 +36,7 @@ class TestLogin(BaseLoginTest):
         user = models.User(email="someone@email.com")
         self.mock_login_service.authenticate_login.return_value = user
 
-        credentials = schema.Credentials(email="user@test.com", password="password")
+        credentials = schema.Credentials(email="user@tests.com", password="password")
         actual_response = test_client.post(POST_PATH, json=credentials.dict())
 
         assert actual_response.status_code == HTTPStatus.OK

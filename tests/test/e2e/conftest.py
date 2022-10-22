@@ -26,7 +26,7 @@ def pytest_configure(config):
     apply_migrations()
     global server_process
     check_port_is_unused(port=PORT)
-    server_process = start_server()
+    server_process = start_server(port=PORT)
 
     try:
         wait_for_server(server_process)
@@ -86,6 +86,7 @@ def start_server(port: int = PORT) -> subprocess.Popen:
     process = subprocess.Popen(
         cmds, shell=False, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE
     )
+
     return process
 
 
@@ -117,7 +118,7 @@ def db_session() -> Session:
 @pytest.fixture(scope="module")
 def test_user(db_session: Session) -> Generator[Dict, None, None]:
     user = models.User(
-        first_name="test",
+        first_name="tests",
         last_name="user",
         email="test_user@email.com",
         password="password",
