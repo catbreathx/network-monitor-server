@@ -1,9 +1,9 @@
 from http import HTTPStatus
 
-from e2e import commands, utils
-from e2e.utils import assert_model_response, assert_success_response_with_id
-from monitor import schema
 from monitor.authentication import jwt
+from test.e2e import commands, utils
+from test.e2e.utils import assert_model_response, assert_success_response_with_id
+from monitor import schema
 from monitor.database import models
 from monitor.settings import app_settings
 
@@ -56,7 +56,7 @@ class TestHostFlow:
         assert response.json() == expected_response
 
     def test_when_unauthorized(self, test_user: schema.User):
-        test_user = models.User(email="test@user.com")
+        test_user = models.User(email="tests@user.com")
         host_create = schema.HostCreate(name="Control", ip_address="192.168.0.10", enabled=True)
         private_key = app_settings().jwt_private_key.get_secret_value()
         jwt_token = jwt.create_jwt_token(test_user, 1, secret_key=private_key)

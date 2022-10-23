@@ -7,11 +7,9 @@ from starlette.testclient import TestClient
 from starlette_context import context
 
 from monitor import service, schema
-from monitor.app import app
+from monitor.app import app_instance
 from monitor.database import models
 from monitor.route import authorization
-from monitor.schema import UserCreate
-from monitor.service import UserService, create_user_service
 from test.unit.route.base_test import BaseRouteTest
 
 USER_BASE_PATH = "/api/v1/users"
@@ -23,10 +21,10 @@ class BaseTestUser(BaseRouteTest):
 
     @pytest.fixture(autouse=True)
     def setup_test(self) -> Generator[None, None, None]:
-        self.mock_user_service = create_autospec(UserService)
+        self.mock_user_service = create_autospec(service.UserService)
 
         mock_create_user_service = create_autospec(
-            create_user_service, return_value=self.mock_user_service
+            service.create_user_service, return_value=self.mock_user_service
         )
         self.mock_set_current_user_in_context = create_autospec(
             authorization.set_current_user_in_context
@@ -38,11 +36,11 @@ class BaseTestUser(BaseRouteTest):
         def set_current_user_in_context():
             context.data["user"] = self.mock_set_current_user_in_context()
 
-        app.dependency_overrides[
+        app_instance.dependency_overrides[
             authorization.set_current_user_in_context
         ] = set_current_user_in_context
 
-        app.dependency_overrides[service.create_user_service] = mock_create_user_service
+        app_instance.dependency_overrides[service.create_user_service] = mock_create_user_service
 
         yield
 
@@ -72,7 +70,7 @@ class BaseTestUser(BaseRouteTest):
 
 class TestPostUser(BaseTestUser):
     def test_success_and_return_201(self, test_client: TestClient, post_payload: Dict):
-        user_create = UserCreate(**post_payload)
+        user_create = schema.UserCreate(**post_payload)
         new_user = models.User(**{"id": 1})
         self.mock_user_service.create_user.return_value = new_user
 
@@ -82,7 +80,7 @@ class TestPostUser(BaseTestUser):
         self.mock_user_service.create_user.assert_called_once_with(user_create)
 
     def test_when_user_fails_validation(self, test_client: TestClient, post_payload: Dict):
-        user_create = UserCreate(**post_payload)
+        user_create = schema.UserCreate(**post_payload)
         user_create.password = "another_password"
 
         response = test_client.post(USER_BASE_PATH, json=user_create.dict())
@@ -92,7 +90,7 @@ class TestPostUser(BaseTestUser):
     def test_when_exception_thrown_and_expect_500_exception(
         self, test_client: TestClient, post_payload: Dict
     ):
-        self.mock_user_service.create_user.side_effect = Exception("test exception")
+        self.mock_user_service.create_user.side_effect = Exception("tests exception")
         response = test_client.post(USER_BASE_PATH, json=post_payload)
 
         assert response.status_code == HTTPStatus.INTERNAL_SERVER_ERROR

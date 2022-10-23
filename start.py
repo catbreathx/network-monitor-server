@@ -20,6 +20,6 @@ if __name__ == "__main__":
 
     os.environ["ENV_FILE"] = env_file
 
-    from monitor.app import app
+    from monitor.app import app_instance
 
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(app_instance, host="0.0.0.0", port=port)

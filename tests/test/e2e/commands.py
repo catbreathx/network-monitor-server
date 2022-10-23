@@ -2,7 +2,7 @@ import requests
 from fastapi.encoders import jsonable_encoder
 from requests import Response
 
-from e2e.request_utils import JWTAuth
+from test.e2e.request_utils import JWTAuth
 from monitor import schema
 
 BASE_URL = "http://localhost:5002/api/v1"
