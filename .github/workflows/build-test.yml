@@ -16,6 +16,17 @@ jobs:
     name: Build and Test
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options:
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       - uses: actions/checkout@v3
 
@@ -37,6 +48,9 @@ jobs:
 
       - name: Run Unit Tests
         run: poetry run pytest tests/test/unit
+
+      - name: Run migrations
+        run: psql -f tests/database/init_e2e_database.sql postgresql://postgres:postgres@localhost:5432/postgres
 
       - name: Run e2e Tests
         run: poetry run pytest tests/test/e2e
