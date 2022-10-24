@@ -14,7 +14,7 @@ class UserService:
 
     def create_user(self, user_create: schema.UserCreate) -> models.User:
         try:
-            user = self._user_repository.create_user(self._db, user_create)
+            user = self._user_repository.create_resource(self._db, user_create)
             self._db.commit()
         except Exception as e:
             self._db.rollback()

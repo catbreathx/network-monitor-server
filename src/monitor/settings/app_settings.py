@@ -1,4 +1,6 @@
-from pydantic import BaseSettings, PostgresDsn, Field, SecretStr
+from typing import Optional
+
+from pydantic import BaseSettings, Field, PostgresDsn, SecretStr
 
 
 class Settings(BaseSettings):
@@ -8,6 +10,7 @@ class Settings(BaseSettings):
     jwt_token_expiration_minutes: int = Field(env="JWT_TOKEN_EXPIRATION_MINUTES")
     jwt_refresh_token_expiration_minutes: int = Field(env="REFRESH_TOKEN_EXPIRE_MINUTES")
     jwt_algorithm: str = Field(env="JWT_ALGORITHM")
+    scheduler_enabled: Optional[bool] = Field(env="SCHEDULER_ENABLED", default=True)
 
     class Config:
         env_file = ".env"

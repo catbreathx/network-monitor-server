@@ -19,6 +19,7 @@ python-dotenv = "^0.21.0"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
 uvicorn = {extras = ["standard"], version = "^0.18.2"}
 starlette-context = "0.3.0"
+apscheduler = "^3.9.1"
 
 
 [tool.poetry.dev-dependencies]
@@ -40,3 +41,6 @@ line-length = 100
 
 [tool.pytest.ini_options]
 pythonpath = ['src', 'test/unit']
+
+[tool.isort]
+profile = "black"

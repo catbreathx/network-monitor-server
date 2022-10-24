@@ -25,6 +25,12 @@ loggers:
         propagate: False
         qualname: fastapi
 
+    apscheduler:
+        level: DEBUG
+        handlers: [console]
+        propagate: False
+        qualname: apscheduler
+
 root:
     level: DEBUG
     handlers: [console]

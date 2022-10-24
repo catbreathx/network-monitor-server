@@ -1,0 +1,2 @@
+class HostHealthCheckRepository:
+    pass

@@ -23,7 +23,7 @@ class HostService:
 
     def create_host(self, host_create: schema.HostCreate) -> models.Host:
         try:
-            host = self._host_repository.create_host(self._db, host_create)
+            host = self._host_repository.create_resource(self._db, host_create)
             self._db.commit()
         except Exception as e:
             self._db.rollback()
@@ -39,7 +39,7 @@ class HostService:
 
         existing_host.update_from(update_host.dict())
 
-        self._host_repository.update_host(self._db, existing_host)
+        self._host_repository.update_resource(self._db, existing_host)
 
         return existing_host
 

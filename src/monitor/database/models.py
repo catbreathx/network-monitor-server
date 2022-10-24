@@ -1,7 +1,18 @@
 from passlib.context import CryptContext
-from sqlalchemy import Column, Integer, Boolean, UniqueConstraint, Text, inspect
+from sqlalchemy import (
+    TIMESTAMP,
+    Boolean,
+    Column,
+    ForeignKey,
+    Integer,
+    Text,
+    UniqueConstraint,
+    func,
+    inspect,
+)
 from sqlalchemy.orm import validates
 
+from monitor.database import utils
 from monitor.database.db import Base
 from monitor.database.fields import Password
 
@@ -10,6 +21,7 @@ password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class AbstractBaseModel(Base):
     __abstract__ = True
+    id = Column(Integer, primary_key=True)
 
     def update_from(self, obj: dict):
         for var, value in obj.items():
@@ -24,7 +36,6 @@ class AbstractBaseModel(Base):
 class Host(AbstractBaseModel):
     __tablename__ = "host"
 
-    id = Column(Integer, primary_key=True)
     name = Column(Text, nullable=False)
     ip_address = Column(Text, nullable=True)
     enabled = Column(Boolean, default=True, nullable=False)
@@ -36,7 +47,6 @@ class Host(AbstractBaseModel):
 class User(AbstractBaseModel):
     __tablename__ = "user"
 
-    id = Column(Integer, primary_key=True)
     first_name = Column(Text, nullable=False)
     last_name = Column(Text, nullable=True)
     email = Column(Text, nullable=False)
@@ -52,7 +62,7 @@ class User(AbstractBaseModel):
         return f"{self.first_name} {self.last_name}"
 
     @validates("password")
-    def validate_password(self, key: str, password):
+    def validate_password(self, key: str, password: str) -> utils.PasswordHash:
         validator = getattr(type(self), key).type.validator
         result = validator(password)
         return result
@@ -61,3 +71,20 @@ class User(AbstractBaseModel):
     def is_active(self) -> bool:
         active = self.account_confirmed is True and self.enabled is True
         return active
+
+
+class ScheduledJob(AbstractBaseModel):
+    __tablename__ = "scheduled_job"
+
+    ping_success = Column(Boolean, nullable=False)
+    job = Column(Text, nullable=False)
+    trigggered_by = Column(Text, nullable=False)
+    date_time = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
+
+
+class HostCheckResult(AbstractBaseModel):
+    __tablename__ = "host_check_result"
+
+    host_id = Column(Integer, ForeignKey(f"{ScheduledJob.__tablename__}.id"), nullable=False)
+    reachable = Column(Boolean, nullable=False)
+    output_text = Column(Text, nullable=False)
