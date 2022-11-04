@@ -14,7 +14,7 @@ class AbstractBaseRepository(ABC):
     def model(self) -> type[models.AbstractBaseModel]:
         return self._model
 
-    def get_all(self, session: Session):
+    def get_all(self, session: Session) -> models.AbstractBaseModel:
         statement = select(self.model)
         result = session.execute(statement)
         hosts = result.scalars().all()

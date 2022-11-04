@@ -22,6 +22,7 @@ def bootstrap():
 
         settings.load_settings(os.environ["ENV_FILE"])
         db.initialize_database()
+        db.test_database()
 
         global app_instance
         app_instance = FastAPI(middleware=starlette_middleware)
@@ -40,7 +41,7 @@ def bootstrap():
         route.create_exception_handlers(app_instance)
 
     except Exception as e:
-        print(f"Error Could not start up Server {e}")
+        print(f"Error Could not start up Server: {e}")
         exit(1)
 
 

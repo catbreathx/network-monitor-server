@@ -82,9 +82,13 @@ class ScheduledJob(AbstractBaseModel):
     date_time = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
 
 
-class HostCheckResult(AbstractBaseModel):
-    __tablename__ = "host_check_result"
+class HostHealthCheck(AbstractBaseModel):
+    __tablename__ = "host_health_check"
 
-    host_id = Column(Integer, ForeignKey(f"{ScheduledJob.__tablename__}.id"), nullable=False)
-    reachable = Column(Boolean, nullable=False)
+    is_reachable = Column(Boolean, nullable=False)
     output_text = Column(Text, nullable=False)
+    host_id = Column(Integer, ForeignKey(f"{Host.__tablename__}.id"), nullable=False)
+
+    scheduled_job_id = Column(
+        Integer, ForeignKey(f"{ScheduledJob.__tablename__}.id"), nullable=False
+    )

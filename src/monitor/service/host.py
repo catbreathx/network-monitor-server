@@ -16,7 +16,7 @@ class HostService:
         self._db = db
         self._host_repository = host_repository
 
-    def get_all(self) -> list[schema.Host]:
+    def get_all(self) -> list[models.Host]:
         hosts = self._host_repository.get_all(self._db)
 
         return hosts
