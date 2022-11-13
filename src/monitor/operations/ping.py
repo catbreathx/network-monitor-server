@@ -7,7 +7,7 @@ import ping3
 logger = logging.getLogger(__name__)
 
 
-def perform_ping(ip_address: str, timeout=5):
+def perform_ping(ip_address: str, timeout: int = 5) -> (bool, str):
     logger.debug(f"Pinging IP - {ip_address}")
 
     ping3.EXCEPTIONS = True

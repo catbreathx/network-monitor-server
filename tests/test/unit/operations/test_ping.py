@@ -13,13 +13,13 @@ class TestPerformPing:
         assert ip_to_test in actual_output
 
     def test_unsuccessful_ping_and_then_return_false_with_ping_output(self):
-        ip_to_test = "127.0.0.0"
+        ip_to_test = "A.0.0.0"
         actual_ping_result, actual_output = perform_ping(ip_to_test, timeout=1)
 
-        expected_output = "Request timeout for ICMP packet. (Timeout=1s)"
+        expected_output = "Cannot resolve: Unknown host. (Host='A.0.0.0')"
 
         assert actual_ping_result is False
-        assert expected_output == actual_output
+        assert actual_output == expected_output
 
     @mock.patch("ping3.verbose_ping", autospec=True)
     def test_when_ping_throws_exception_and_then_return_false_with_exception(
