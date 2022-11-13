@@ -1,19 +1,18 @@
 import json
 from http import HTTPStatus
+from test.unit.route.base_test import BaseRouteTest
+from test.utils import model_list_to_json
 from typing import List
 from unittest import mock
 from unittest.mock import create_autospec
 
 import pytest
 from starlette.testclient import TestClient
-from starlette_context import context
 
-from monitor import service, schema
+from monitor import schema, service
 from monitor.app import app_instance
 from monitor.database import models
 from monitor.route import authorization
-from test.unit.route.base_test import BaseRouteTest
-from test.utils import model_list_to_json
 
 HOST_BASE_PATH = "/api/v1/hosts"
 
@@ -43,16 +42,7 @@ class BaseTestHost(BaseRouteTest):
             service.create_host_service, spec_set=True, return_value=self.mock_host_service
         )
 
-        user = models.User(id=1, email="user@mail.com")
-        self.mock_set_current_user_in_context.return_value = user
-
-        def set_current_user_in_context():
-            context.data["user"] = self.mock_set_current_user_in_context()
-
         app_instance.dependency_overrides[service.create_host_service] = mock_create_host_service
-        app_instance.dependency_overrides[
-            authorization.set_current_user_in_context
-        ] = set_current_user_in_context
 
         yield
 

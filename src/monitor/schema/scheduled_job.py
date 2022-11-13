@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Any, Dict
 
 from pydantic import BaseModel
 
@@ -15,7 +16,7 @@ class ScheduledJobCreate(BaseScheduledJob):
 
 class ScheduledJob(BaseScheduledJob):
     id: int
-    ping_success: bool
+    data: Dict[str, Any]
     date_time: datetime
 
     class Config:

@@ -29,7 +29,7 @@ def upgrade() -> None:
     op.create_table(
         "scheduled_job",
         sa.Column("id", sa.Integer(), nullable=False),
-        sa.Column("ping_success", sa.Boolean(), nullable=False),
+        sa.Column("data", sa.JSON(), nullable=True),
         sa.Column("job", sa.Text(), nullable=False),
         sa.Column("triggered_by", sa.Text(), nullable=False),
         sa.Column(

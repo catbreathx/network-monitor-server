@@ -35,6 +35,7 @@ def bootstrap():
         app_instance.include_router(route.host_router)
         app_instance.include_router(route.user_router)
         app_instance.include_router(route.login_router)
+        app_instance.include_router(route.scheduled_job_router)
 
         if settings.app_settings().scheduler_enabled:
             appevents.init_events(app_instance)

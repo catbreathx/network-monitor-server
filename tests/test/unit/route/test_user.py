@@ -1,16 +1,14 @@
 from http import HTTPStatus
+from test.unit.route.base_test import BaseRouteTest
 from typing import Dict, Generator
 from unittest.mock import create_autospec
 
 import pytest
 from starlette.testclient import TestClient
-from starlette_context import context
 
-from monitor import service, schema
+from monitor import schema, service
 from monitor.app import app_instance
 from monitor.database import models
-from monitor.route import authorization
-from test.unit.route.base_test import BaseRouteTest
 
 USER_BASE_PATH = "/api/v1/users"
 
@@ -26,19 +24,6 @@ class BaseTestUser(BaseRouteTest):
         mock_create_user_service = create_autospec(
             service.create_user_service, return_value=self.mock_user_service
         )
-        self.mock_set_current_user_in_context = create_autospec(
-            authorization.set_current_user_in_context
-        )
-
-        user = models.User(id=1, email="user@mail.com")
-        self.mock_set_current_user_in_context.return_value = user
-
-        def set_current_user_in_context():
-            context.data["user"] = self.mock_set_current_user_in_context()
-
-        app_instance.dependency_overrides[
-            authorization.set_current_user_in_context
-        ] = set_current_user_in_context
 
         app_instance.dependency_overrides[service.create_user_service] = mock_create_user_service
 

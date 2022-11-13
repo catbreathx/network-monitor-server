@@ -1,8 +1,7 @@
 from fastapi import Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from starlette_context import context
 
-from monitor import service, request_context
+from monitor import request_context, service
 from monitor.authentication import jwt
 from monitor.database import models
 from monitor.exceptions import exceptions
@@ -28,4 +27,4 @@ def verify_token(
 
 
 def set_current_user_in_context(user: models.User = Depends(verify_token)) -> None:
-    context[request_context.CURRENT_USER] = user
+    request_context.set_user_in_context(user)

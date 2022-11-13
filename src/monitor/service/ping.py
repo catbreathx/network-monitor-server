@@ -30,8 +30,9 @@ class PingService:
         self._scheduled_job_repository = scheduled_job_repository
         self._host_health_check_repository = host_health_check_repository
 
-    def run_scheduled_job(self, triggered_by="SYSTEM"):
+    def run_scheduled_job(self, triggered_by="SYSTEM") -> models.ScheduledJob | None:
         logging.debug("Starting scheduled job...")
+        scheduled_job = None
         try:
             hosts: List[models.Host] = self._host_repository.get_all(self._db)
             scheduled_job = self._run_job(hosts, triggered_by)
@@ -40,6 +41,8 @@ class PingService:
             logger.error(f"Exception during job scheduled - {e}")
         finally:
             self._db.commit()
+
+        return scheduled_job
 
     # todo: split this up
     def ping_host(self, host_id: int) -> (bool, str):
@@ -69,7 +72,7 @@ class PingService:
             all_hosts_pinged = (all_hosts_pinged == success) is True
             self._host_health_check_repository.create_resource(self._db, health_check)
 
-        scheduled_job.ping_success = all_hosts_pinged
+        scheduled_job.data = {"success": all_hosts_pinged}
         return scheduled_job
 
     def _create_scheduled_job(

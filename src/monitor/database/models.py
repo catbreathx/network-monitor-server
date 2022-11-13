@@ -1,5 +1,6 @@
 from passlib.context import CryptContext
 from sqlalchemy import (
+    JSON,
     TIMESTAMP,
     Boolean,
     Column,
@@ -76,7 +77,7 @@ class User(AbstractBaseModel):
 class ScheduledJob(AbstractBaseModel):
     __tablename__ = "scheduled_job"
 
-    ping_success = Column(Boolean, nullable=False)
+    data = Column(JSON, nullable=True)
     job = Column(Text, nullable=False)
     triggered_by = Column(Text, nullable=False)
     date_time = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
