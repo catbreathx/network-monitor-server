@@ -22,7 +22,6 @@ def bootstrap():
 
         settings.load_settings(os.environ["ENV_FILE"])
         db.initialize_database()
-
         db.test_database()
 
         global app_instance

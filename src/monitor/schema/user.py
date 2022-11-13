@@ -9,7 +9,7 @@ from monitor.schema.password_validator import PasswordValidator
 class BaseUser(BaseModel):
     email: str
     first_name: str
-    last_name: str
+    last_name: str | None
 
     @root_validator
     def normalize_values(cls, values: typing.Dict) -> typing.Dict:
