@@ -1,7 +1,7 @@
 import typing
 from builtins import ValueError
 
-from pydantic import BaseModel, validator, root_validator
+from pydantic import BaseModel, root_validator, validator
 
 from monitor.schema.password_validator import PasswordValidator
 
@@ -50,7 +50,7 @@ class UserCreate(BaseUser):
         exclude = {"confirm_password"}
 
 
-class PutUser(BaseModel):
+class UserUpdate(BaseModel):
     class Config:
         orm_mode = True
 

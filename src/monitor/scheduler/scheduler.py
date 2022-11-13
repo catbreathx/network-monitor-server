@@ -1,6 +1,6 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from monitor.scheduler import ping_job
+from monitor.scheduler.jobs import ping_job
 
 scheduler_instance: AsyncIOScheduler
 

@@ -17,9 +17,9 @@ logger = logging.getLogger(__name__)
 
 def initialize_database():
     logger.info("Initializing database...")
-    postgres_url = app_settings().database_url
+    database_url = app_settings().database_url
     global engine
-    engine = create_engine(postgres_url, echo=True, future=True, pool_pre_ping=True)
+    engine = create_engine(database_url, echo=True, future=True, pool_pre_ping=True)
 
 
 def test_database():

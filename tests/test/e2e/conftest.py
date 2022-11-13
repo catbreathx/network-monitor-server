@@ -5,17 +5,17 @@ import subprocess
 import time
 from typing import Dict, Generator
 
-import alembic
 import pytest
 from _pytest.config import ExitCode
-from alembic.config import Config
 from sqlalchemy.orm import Session
 
+import alembic
+from alembic.config import Config
 from monitor.database import db, models
 from monitor.database.db import initialize_database
-from monitor.settings import load_settings, app_settings
+from monitor.settings import app_settings, load_settings
 
-PORT = 5002
+DEFAULT_PORT = 5002
 
 server_process: subprocess.Popen
 
@@ -24,10 +24,16 @@ def pytest_configure(config):
     load_settings("e2e.env")
     initialize_database()
     apply_migrations()
-    global server_process
-    check_port_is_unused(port=PORT)
-    server_process = start_server(port=PORT)
+    use_embedded_server = _is_using_embedded_server()
 
+    if use_embedded_server == "true":
+        _start_embedded_server()
+
+
+def _start_embedded_server():
+    global server_process
+    check_port_is_unused(port=DEFAULT_PORT)
+    server_process = start_server(port=DEFAULT_PORT)
     try:
         wait_for_server(server_process)
     except Exception:
@@ -35,9 +41,15 @@ def pytest_configure(config):
         print(err)
 
 
+def _is_using_embedded_server():
+    use_embedded_server = os.getenv("USE_EMBEDDED_SERVER", "True").lower()
+    return use_embedded_server
+
+
 def pytest_sessionfinish(session, exitstatus):
-    global server_process
-    server_process.kill()
+    if _is_using_embedded_server():
+        global server_process
+        server_process.kill()
 
     if exitstatus == ExitCode.OK:
         teardown_migration()
@@ -45,7 +57,7 @@ def pytest_sessionfinish(session, exitstatus):
 
 def wait_for_server(server_process: subprocess.Popen) -> None:
     try:
-        wait_for_port(port=PORT)
+        wait_for_port(port=DEFAULT_PORT)
 
         if server_process.poll() is not None:
             raise Exception("Server didn't start successfully")
@@ -78,7 +90,7 @@ def wait_for_port(port: int, host: str = "localhost", timeout: float = 5.0) -> N
                 ) from ex
 
 
-def start_server(port: int = PORT) -> subprocess.Popen:
+def start_server(port: int = DEFAULT_PORT) -> subprocess.Popen:
     cmd = f"python start.py --envfile=e2e.env --port={port}"
 
     cmds = shlex.split(cmd)
@@ -90,7 +102,7 @@ def start_server(port: int = PORT) -> subprocess.Popen:
     return process
 
 
-def check_port_is_unused(port: int = PORT) -> None:
+def check_port_is_unused(port: int = DEFAULT_PORT) -> None:
     try:
         wait_for_port(port=port, timeout=0.1)
         raise Exception(f"Port {port} is already in use.")
@@ -132,4 +144,21 @@ def test_user(db_session: Session) -> Generator[Dict, None, None]:
     yield user
 
     db_session.delete(user)
+    db_session.commit()
+
+
+@pytest.fixture()
+def test_hosts(db_session: Session) -> Generator[Dict, None, None]:
+    host1 = models.Host(name="Raspberry Pi", ip_address="127.0.0.1", enabled=True)
+
+    host2 = models.Host(name="Mac Mini", ip_address="127.0.0.1", enabled=False)
+
+    db_session.add(host1)
+    db_session.add(host2)
+    db_session.commit()
+
+    yield [host1, host2]
+
+    db_session.delete(host1)
+    db_session.delete(host2)
     db_session.commit()

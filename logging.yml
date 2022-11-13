@@ -12,6 +12,14 @@ handlers:
         formatter: simple
         stream: ext://sys.stdout
 
+    file:
+        class: logging.FileHandler
+        level: DEBUG
+        filename: server.log
+        encoding: utf8
+        mode: w
+
+
 loggers:
     monitor:
         level: DEBUG
@@ -33,4 +41,4 @@ loggers:
 
 root:
     level: DEBUG
-    handlers: [console]
+    handlers: [console, file]

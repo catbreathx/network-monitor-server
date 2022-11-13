@@ -19,9 +19,7 @@ def assert_model_response(schema_model: BaseModel, response_model: dict) -> None
     assert normalized_schema_model == assert_response_model
 
 
-def assert_success_response_with_id(
-    response: Response, expected_status_code, expected_resource_id: int
-):
+def assert_success_response(response: Response, expected_status_code):
     assert response.status_code == expected_status_code
     host_response = response.json()
-    assert host_response["id"] == expected_resource_id
+    assert host_response["id"] is not None

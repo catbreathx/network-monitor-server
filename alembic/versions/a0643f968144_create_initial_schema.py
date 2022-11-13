@@ -31,7 +31,7 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("ping_success", sa.Boolean(), nullable=False),
         sa.Column("job", sa.Text(), nullable=False),
-        sa.Column("trigggered_by", sa.Text(), nullable=False),
+        sa.Column("triggered_by", sa.Text(), nullable=False),
         sa.Column(
             "date_time",
             sa.TIMESTAMP(timezone=True),

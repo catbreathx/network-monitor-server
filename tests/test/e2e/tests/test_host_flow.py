@@ -1,20 +1,16 @@
 from http import HTTPStatus
+from test.e2e import commands
+from test.e2e.utils import assert_model_response, assert_success_response
 
-from monitor.authentication import jwt
-from test.e2e import commands, utils
-from test.e2e.utils import assert_model_response, assert_success_response_with_id
 from monitor import schema
+from monitor.authentication import jwt
 from monitor.database import models
 from monitor.settings import app_settings
 
 
 class TestHostFlow:
-    def test_user_flow(self, test_user: schema.User):
-        response = commands.login(test_user.email, "password")
-        assert response.status_code == HTTPStatus.OK
-
-        access_token = utils.get_access_token(response)
-
+    def test_host_flow(self, test_user: schema.User):
+        access_token = commands.authenticate(test_user.email)
         host_create = schema.HostCreate(name="Control", ip_address="192.168.0.10", enabled=True)
         response = commands.create_host(host_create, access_token)
         response = commands.get_one_host(response.json()["id"], access_token)
@@ -22,7 +18,7 @@ class TestHostFlow:
 
         host_create = schema.HostCreate(name="Raspberry", ip_address="192.168.0.1", enabled=True)
         response = commands.create_host(host_create, access_token)
-        assert_success_response_with_id(response, HTTPStatus.CREATED, 2)
+        assert_success_response(response, HTTPStatus.CREATED)
 
         response = commands.get_one_host(response.json()["id"], access_token)
         assert response.status_code == HTTPStatus.OK
@@ -33,7 +29,7 @@ class TestHostFlow:
         host_update = schema.HostUpdate(name="Raspberry Pi", ip_address="192.168.0.2", enabled=True)
         response = commands.update_host(host_response["id"], host_update, access_token)
 
-        assert_success_response_with_id(response, HTTPStatus.OK, 2)
+        assert_success_response(response, HTTPStatus.OK)
 
         response = commands.get_one_host(host_response["id"], access_token)
         assert response.status_code == HTTPStatus.OK

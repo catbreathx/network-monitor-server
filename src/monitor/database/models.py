@@ -78,7 +78,7 @@ class ScheduledJob(AbstractBaseModel):
 
     ping_success = Column(Boolean, nullable=False)
     job = Column(Text, nullable=False)
-    trigggered_by = Column(Text, nullable=False)
+    triggered_by = Column(Text, nullable=False)
     date_time = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
 
 

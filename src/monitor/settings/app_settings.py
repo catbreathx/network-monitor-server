@@ -1,10 +1,10 @@
 from typing import Optional
 
-from pydantic import BaseSettings, Field, PostgresDsn, SecretStr
+from pydantic import BaseSettings, Field, SecretStr
 
 
 class Settings(BaseSettings):
-    database_url: PostgresDsn = Field(env="DATABASE_URL")
+    database_url: str = Field(env="DATABASE_URL")
     jwt_private_key: SecretStr = Field(env="JWT_PRIVATE_KEY")
     jwt_public_key: str = Field(env="JWT_PUBLIC_KEY")
     jwt_token_expiration_minutes: int = Field(env="JWT_TOKEN_EXPIRATION_MINUTES")

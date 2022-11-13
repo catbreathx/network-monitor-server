@@ -1,15 +1,10 @@
 from .base import BaseHotasModel
-from .host import Host
-from .host import HostCreate
-from .host import HostCreateOut
-from .host import HostUpdate
+from .host import Host, HostCreate, HostCreateOut, HostUpdate
+from .host_health_check import HostHealthCheckIn, HostHealthCheckOut
 from .login import Credentials
 from .password_validator import PasswordValidator
-from .user import PutUser
-from .user import User
-from .user import UserCreate
-from .user import UserCreateOut
-from .user import UserGetOut
+from .scheduled_job import ScheduledJobCreate, ScheduledJobOut
+from .user import User, UserCreate, UserCreateOut, UserGetOut, UserUpdate
 
 
 def init_schema(app):
