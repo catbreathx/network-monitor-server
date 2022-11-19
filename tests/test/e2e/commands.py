@@ -63,7 +63,5 @@ def get_all_hosts(access_token: str) -> Response:
 
 
 def run_health_check(access_token: str):
-    response = requests.post(
-        _get_url("/scheduledjob/host_health_check"), auth=JWTAuth(access_token)
-    )
+    response = requests.post(_get_url("/scheduledjob/ping"), auth=JWTAuth(access_token))
     return response

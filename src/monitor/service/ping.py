@@ -59,6 +59,7 @@ class PingService:
             triggered_by=triggered_by, job="Host HealthCheck"
         )
         scheduled_job: models.ScheduledJob = self._create_scheduled_job(scheduled_job_create)
+        self._db.flush()
         all_hosts_pinged = True
 
         for host in hosts:

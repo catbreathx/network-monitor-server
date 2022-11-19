@@ -30,8 +30,9 @@ def test_database():
         raise Exception("Database is not available")
 
 
-def get_session() -> Session:
-    return Session(engine)
+def get_session(**kwargs) -> Session:
+    session = Session(engine, **kwargs)
+    return session
 
 
 def adapt_pydantic_ip_address(ip):

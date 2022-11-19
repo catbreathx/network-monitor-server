@@ -22,12 +22,17 @@ server_process: subprocess.Popen
 
 def pytest_configure(config):
     load_settings("e2e.env")
-    initialize_database()
-    apply_migrations()
+    initialize_e2e_database()
+
     use_embedded_server = _is_using_embedded_server()
 
     if use_embedded_server == "true":
         _start_embedded_server()
+
+
+def initialize_e2e_database():
+    initialize_database()
+    db.Base.metadata.create_all(bind=db.engine)
 
 
 def _start_embedded_server():
@@ -52,7 +57,7 @@ def pytest_sessionfinish(session, exitstatus):
         server_process.kill()
 
     if exitstatus == ExitCode.OK:
-        teardown_migration()
+        db.Base.metadata.drop_all(bind=db.engine)
 
 
 def wait_for_server(server_process: subprocess.Popen) -> None:
@@ -122,12 +127,30 @@ def teardown_migration():
     alembic.command.downgrade(config, "base")
 
 
+@pytest.fixture(scope="session", autouse=True)
+def create_database():
+    connect = db.engine.connect()
+    models.Base.metadata.bind = connect
+    models.Base.metadata.create_all()
+
+
+@pytest.fixture(autouse=True)
+def clear_tables(db_session):
+    yield
+
+    for table in reversed(db.Base.metadata.sorted_tables):
+        db_session.execute(table.delete())
+
+    db_session.commit()
+
+
 @pytest.fixture(scope="module")
 def db_session() -> Session:
-    return db.get_session()
+    db_session = db.get_session()
+    yield db_session
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 def test_user(db_session: Session) -> Generator[Dict, None, None]:
     user = models.User(
         first_name="tests",
@@ -143,14 +166,10 @@ def test_user(db_session: Session) -> Generator[Dict, None, None]:
 
     yield user
 
-    db_session.delete(user)
-    db_session.commit()
-
 
 @pytest.fixture()
 def test_hosts(db_session: Session) -> Generator[Dict, None, None]:
     host1 = models.Host(name="Raspberry Pi", ip_address="127.0.0.1", enabled=True)
-
     host2 = models.Host(name="Mac Mini", ip_address="127.0.0.1", enabled=False)
 
     db_session.add(host1)
@@ -158,7 +177,3 @@ def test_hosts(db_session: Session) -> Generator[Dict, None, None]:
     db_session.commit()
 
     yield [host1, host2]
-
-    db_session.delete(host1)
-    db_session.delete(host2)
-    db_session.commit()

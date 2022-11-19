@@ -12,6 +12,7 @@ alembic = "^1.8.1"
 apscheduler = "^3.9.1"
 click = "^8.1.3"
 fastapi = "^0.86"
+fastapi-mail = "1.2.0"
 gunicorn = "^20.1.0"
 passlib = {extras = ["bcrypt"], version = "^1.7.4"}
 ping3 = "^4.0.3"
