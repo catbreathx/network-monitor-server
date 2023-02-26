@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from test.unit.tests.route.base_test import BaseRouteTest
 from typing import Generator
 from unittest import mock
 from unittest.mock import create_autospec
@@ -10,6 +9,7 @@ from starlette.testclient import TestClient
 from monitor import schema, service
 from monitor.app import app_instance
 from monitor.database import models
+from tests.unit.test.route.base_test import BaseRouteTest
 
 POST_PATH = "/api/v1/login"
 

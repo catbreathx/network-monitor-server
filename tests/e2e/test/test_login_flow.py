@@ -1,7 +1,7 @@
 from http import HTTPStatus
-from test.e2e import commands, utils
 
 from monitor import schema
+from tests.e2e import commands, utils
 
 
 class TestUserFlow:

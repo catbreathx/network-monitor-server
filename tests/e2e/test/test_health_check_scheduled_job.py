@@ -1,5 +1,4 @@
 from http import HTTPStatus
-from test.e2e import commands
 from typing import List
 
 import pytest
@@ -7,6 +6,7 @@ from requests import Session
 
 from monitor import schema
 from monitor.database import models
+from tests.e2e import commands
 
 
 @pytest.fixture()

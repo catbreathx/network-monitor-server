@@ -1,11 +1,11 @@
 from http import HTTPStatus
-from test.e2e import commands
-from test.e2e.utils import assert_model_response, assert_success_response
 
 from monitor import schema
 from monitor.authentication import jwt
 from monitor.database import models
 from monitor.settings import app_settings
+from tests.e2e import commands
+from tests.e2e.utils import assert_model_response, assert_success_response
 
 
 class TestHostFlow:

@@ -1,6 +1,5 @@
 import json
 from http import HTTPStatus
-from test.unit.tests.route.base_test import BaseRouteTest
 from typing import List
 from unittest import mock
 from unittest.mock import create_autospec
@@ -12,6 +11,7 @@ from monitor import schema, service
 from monitor.app import app_instance
 from monitor.database import model_list_to_json, models
 from monitor.route import authorization
+from tests.unit.test.route.base_test import BaseRouteTest
 
 HOST_BASE_PATH = "/api/v1/hosts"
 

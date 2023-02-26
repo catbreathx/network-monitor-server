@@ -1,6 +1,5 @@
 import datetime
 from http import HTTPStatus
-from test.unit.tests.route.base_test import BaseRouteTest
 from typing import Generator
 from unittest import mock
 from unittest.mock import create_autospec
@@ -11,6 +10,7 @@ from starlette.testclient import TestClient
 from monitor import service
 from monitor.app import app_instance
 from monitor.database import models
+from tests.unit.test.route.base_test import BaseRouteTest
 
 SCHEDULED_JOB_BASE_PATH = "/api/v1/scheduledjob"
 SCHEDULED_JOB_PATH = SCHEDULED_JOB_BASE_PATH + "/ping"

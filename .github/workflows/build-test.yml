@@ -49,10 +49,10 @@ jobs:
         run: poetry install
 
       - name: Run Unit Tests
-        run: poetry run pytest tests/test/unit
+        run: poetry run pytest tests/unit
 
       - name: Create e2e database
         run: psql -f tests/database/init_e2e_database.sql postgresql://postgres:postgres@localhost:5432/postgres
 
       - name: Run e2e Tests
-        run: poetry run pytest tests/test/e2e
+        run: poetry run pytest tests/e2e
