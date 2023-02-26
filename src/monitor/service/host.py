@@ -31,7 +31,7 @@ class HostService:
 
         return host
 
-    def update_host(self, host_id: str, update_host: schema.HostUpdate) -> models.Host:
+    def update_host(self, host_id: int, update_host: schema.HostUpdate) -> models.Host:
         existing_host = self.get_one(host_id=host_id)
 
         if existing_host is None:
@@ -43,7 +43,7 @@ class HostService:
 
         return existing_host
 
-    def get_one(self, host_id: str) -> models.Host | None:
+    def get_one(self, host_id: int) -> models.Host | None:
         host = self._host_repository.get_one(self._db, host_id)
         return host
 

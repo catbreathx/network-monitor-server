@@ -11,6 +11,14 @@ class Settings(BaseSettings):
     jwt_refresh_token_expiration_minutes: int = Field(env="REFRESH_TOKEN_EXPIRE_MINUTES")
     jwt_algorithm: str = Field(env="JWT_ALGORITHM")
     scheduler_enabled: Optional[bool] = Field(env="SCHEDULER_ENABLED", default=True)
+    email_username: str = Field(env="MAIL_USERNAME")
+    email_password: str = Field(env="MAIL_PASSWORD")
+    email_server: str = Field(env="MAIL_SERVER")
+    email_template_directory: str = Field(env="TEMPLATE_FOLDER")
+    email_port: int = Field(env="MAIL_PORT")
+    email_starttls: bool = Field(env="MAIL_STARTTLS", default=True)
+    email_ssl_tls: bool = Field(env="MAIL_SSL_TLS", default=True)
+    mail_from: str = Field(env="MAIL_FROM")
 
     class Config:
         env_file = ".env"

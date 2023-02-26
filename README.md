@@ -1,11 +1,39 @@
 # Network Monitor
 
+## Create Virtual Environment
+
+To create a virtual environment:
+poetry env use <python executable>
+
+For example:
+```
+poetry env use python3.10
+```
+
+To activate:
+
+```
+poetry shell
+```
+
+To install packages, use the `install` command:
+
+```
+poetry install
+```
+
 ## Database
 
 To (re-)create a local database, run the `initialize.sh` script:
 
 ```
 sh initialize_db.sh
+```
+
+create e2e database:
+
+```
+sh initialize_e2e_db.sh
 ```
 
 

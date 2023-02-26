@@ -1,11 +1,9 @@
-import ipaddress
-
 from pydantic import BaseModel
 
 
 class BaseHost(BaseModel):
     name: str
-    ip_address: ipaddress.IPv4Address
+    ip_address: str
     enabled: bool = True
 
 

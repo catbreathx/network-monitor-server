@@ -52,7 +52,7 @@ def update_host(resource_id: int, host_update: schema.HostUpdate, access_token: 
     return response
 
 
-def get_one_host(resource_id: int | str, access_token: str) -> Response:
+def get_one_host(resource_id: int, access_token: str) -> Response:
     response = requests.get(_get_url(f"/hosts/{resource_id}"), auth=JWTAuth(access_token))
     return response
 

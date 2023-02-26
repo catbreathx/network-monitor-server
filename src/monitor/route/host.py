@@ -1,8 +1,8 @@
 from http import HTTPStatus
 
-from fastapi import Depends, APIRouter
+from fastapi import APIRouter, Depends
 
-from monitor import schema, exceptions, service
+from monitor import exceptions, schema, service
 from monitor.route import authorization
 from monitor.service import create_host_service
 
@@ -17,7 +17,7 @@ router = APIRouter(
     dependencies=[Depends(authorization.set_current_user_in_context)],
 )
 def get_one_host(
-    host_id: str, host_service: service.HostService = Depends(service.create_host_service)
+    host_id: int, host_service: service.HostService = Depends(service.create_host_service)
 ):
     host = host_service.get_one(host_id)
 

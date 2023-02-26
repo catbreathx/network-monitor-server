@@ -129,9 +129,7 @@ def teardown_migration():
 
 @pytest.fixture(scope="session", autouse=True)
 def create_database():
-    connect = db.engine.connect()
-    models.Base.metadata.bind = connect
-    models.Base.metadata.create_all()
+    models.Base.metadata.create_all(db.engine)
 
 
 @pytest.fixture(autouse=True)

@@ -1,0 +1,17 @@
+Hi {{first_name}},
+
+Here's the health check report
+
+<table>
+    <tr>
+        <th>Host</th>
+        <th>Reason of Failure</th>
+    </tr>
+
+    <tr>
+        {% for host in hosts %}
+        <td>{{ host.name }}</td>
+        <td>{{ ip_address }}</td>
+        {% endfor %}
+    </tr>
+</table>

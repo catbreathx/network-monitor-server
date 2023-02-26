@@ -36,6 +36,7 @@ class PingService:
         try:
             hosts: List[models.Host] = self._host_repository.get_all(self._db)
             scheduled_job = self._run_job(hosts, triggered_by)
+
             logger.debug(f"Scheduled job complete, scheduled job id = {scheduled_job.id}")
         except Exception as e:
             logger.error(f"Exception during job scheduled - {e}")

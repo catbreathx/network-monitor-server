@@ -1,7 +1,7 @@
 #!/bin/sh
 
 psql postgresql://postgres:postgres@localhost:5432/postgres << EOF
-  drop database if exists "network-monitor";
+  drop database if exists "network-monitor" (force);
   create database "network-monitor";
 EOF
 

@@ -1,7 +1,6 @@
 import json
 from http import HTTPStatus
 from test.unit.route.base_test import BaseRouteTest
-from test.utils import model_list_to_json
 from typing import List
 from unittest import mock
 from unittest.mock import create_autospec
@@ -11,7 +10,7 @@ from starlette.testclient import TestClient
 
 from monitor import schema, service
 from monitor.app import app_instance
-from monitor.database import models
+from monitor.database import model_list_to_json, models
 from monitor.route import authorization
 
 HOST_BASE_PATH = "/api/v1/hosts"
@@ -77,7 +76,7 @@ class TestGetOneHost(BaseTestHost):
     ):
         self.mock_host_service.get_one.return_value = host_data[0]
 
-        resource_id = "1"
+        resource_id = 1
         response = test_client.get(f"{HOST_BASE_PATH}/{resource_id}")
 
         assert response.status_code == HTTPStatus.OK
@@ -90,7 +89,7 @@ class TestGetOneHost(BaseTestHost):
     ):
         self.mock_host_service.get_one.return_value = None
 
-        resource_id = "1"
+        resource_id = 1
         response = test_client.get(f"{HOST_BASE_PATH}/{resource_id}")
 
         expected_response = {

@@ -1,9 +1,11 @@
+import datetime
+from typing import List, Optional
+
 from passlib.context import CryptContext
 from sqlalchemy import (
     JSON,
     TIMESTAMP,
     Boolean,
-    Column,
     ForeignKey,
     Integer,
     Text,
@@ -11,7 +13,7 @@ from sqlalchemy import (
     func,
     inspect,
 )
-from sqlalchemy.orm import validates
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
 from monitor.database import utils
 from monitor.database.db import Base
@@ -22,7 +24,7 @@ password_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 class AbstractBaseModel(Base):
     __abstract__ = True
-    id = Column(Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
 
     def update_from(self, obj: dict):
         for var, value in obj.items():
@@ -37,9 +39,9 @@ class AbstractBaseModel(Base):
 class Host(AbstractBaseModel):
     __tablename__ = "host"
 
-    name = Column(Text, nullable=False)
-    ip_address = Column(Text, nullable=True)
-    enabled = Column(Boolean, default=True, nullable=False)
+    name: Mapped[str] = mapped_column(nullable=False)
+    ip_address: Mapped[str] = mapped_column(Text, nullable=True)
+    enabled: Mapped[bool] = mapped_column(default=True, nullable=False)
 
     UniqueConstraint("name", "ip_address", name="uq_name")
     UniqueConstraint("ip_address", name="uq_ip_address")
@@ -48,13 +50,15 @@ class Host(AbstractBaseModel):
 class User(AbstractBaseModel):
     __tablename__ = "user"
 
-    first_name = Column(Text, nullable=False)
-    last_name = Column(Text, nullable=True)
-    email = Column(Text, nullable=False)
-    password = Column(Password, nullable=False)
-    enabled = Column(Boolean, default=True, nullable=False)
-    account_confirmed = Column(Boolean, default=False, nullable=False)
-    password_change_token = Column(Text, nullable=True)
+    type_annotation_map = {}
+
+    first_name: Mapped[str] = mapped_column(nullable=False)
+    last_name: Mapped[Optional[str]] = mapped_column(nullable=True)
+    email: Mapped[str] = mapped_column(nullable=False)
+    password: Mapped[str] = mapped_column(Password, nullable=False)
+    enabled: Mapped[bool] = mapped_column(default=True, nullable=False)
+    account_confirmed: Mapped[bool] = mapped_column(default=False, nullable=False)
+    password_change_token: Mapped[Optional[str]] = mapped_column(nullable=True)
 
     UniqueConstraint("email", name="uq_email")
 
@@ -77,19 +81,27 @@ class User(AbstractBaseModel):
 class ScheduledJob(AbstractBaseModel):
     __tablename__ = "scheduled_job"
 
-    data = Column(JSON, nullable=True)
-    job = Column(Text, nullable=False)
-    triggered_by = Column(Text, nullable=False)
-    date_time = Column(TIMESTAMP(timezone=True), nullable=False, server_default=func.now())
+    data: Mapped[Optional[JSON]] = mapped_column(JSON, nullable=True)
+    job: Mapped[str] = mapped_column(Text, nullable=False)
+    triggered_by: Mapped[str] = mapped_column(Text, nullable=False)
+    date_time: Mapped[datetime.datetime] = mapped_column(
+        TIMESTAMP(timezone=True), nullable=False, server_default=func.now()
+    )
+    host_health_checks: Mapped[List["HostHealthCheck"]] = relationship(
+        "HostHealthCheck", back_populates="scheduled_job"
+    )
 
 
 class HostHealthCheck(AbstractBaseModel):
     __tablename__ = "host_health_check"
 
-    is_reachable = Column(Boolean, nullable=False)
-    output_text = Column(Text, nullable=False)
-    host_id = Column(Integer, ForeignKey(f"{Host.__tablename__}.id"), nullable=False)
+    is_reachable: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    output_text: Mapped[bool] = mapped_column(Text, nullable=False)
+    host_id: Mapped[int] = mapped_column(
+        Integer, ForeignKey(f"{Host.__tablename__}.id"), nullable=False
+    )
+    scheduled_job = relationship("ScheduledJob", back_populates="host_health_checks")
 
-    scheduled_job_id = Column(
+    scheduled_job_id = mapped_column(
         Integer, ForeignKey(f"{ScheduledJob.__tablename__}.id"), nullable=False
     )
