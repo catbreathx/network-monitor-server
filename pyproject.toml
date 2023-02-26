@@ -44,7 +44,7 @@ build-backend = "poetry.core.masonry.api"
 line-length = 100
 
 [tool.pytest.ini_options]
-pythonpath = ['src', 'test/unit']
+pythonpath = ['src', 'tests/unit', 'tests/e2e']
 
 [tool.isort]
 profile = "black"

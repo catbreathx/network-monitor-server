@@ -52,7 +52,7 @@ jobs:
         run: poetry run pytest tests/unit
 
       - name: Create e2e database
-        run: psql -f tests/database/init_e2e_database.sql postgresql://postgres:postgres@localhost:5432/postgres
+        run: psql -f tests/e2e/database/init_e2e_database.sql postgresql://postgres:postgres@localhost:5432/postgres
 
       - name: Run e2e Tests
         run: poetry run pytest tests/e2e
