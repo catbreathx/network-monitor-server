@@ -5,7 +5,7 @@ from monitor.settings import load_settings
 
 pytest_plugins = [
     fixture_file.replace("/", ".").replace(".py", "")
-    for fixture_file in glob("tests/test/unit/fixtures/*.py", recursive=True)
+    for fixture_file in glob("test/unit/fixtures/*.py", recursive=True)
 ]
 
 

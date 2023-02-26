@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from test.unit.route.base_test import BaseRouteTest
+from test.unit.tests.route.base_test import BaseRouteTest
 from typing import Dict, Generator
 from unittest.mock import create_autospec
 
