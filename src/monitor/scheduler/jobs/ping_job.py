@@ -21,8 +21,6 @@ class HostPingJob:
             host_health_check_service = service.create_host_health_check_service()
             host_health_check_service.construct_email_report(scheduled_job)
 
-    # host_health_check = service.HealthCheck()
-
 
 def should_produce_report(scheduled_job: models.ScheduledJob):
     """
@@ -31,10 +29,10 @@ def should_produce_report(scheduled_job: models.ScheduledJob):
     :return: bool - if a report should be produced
     """
     host_health_checks = scheduled_job.host_health_checks
-    result = True
+    result = False
     for host_health_check in host_health_checks:
-        if host_health_check.is_reachable is False:
-            result = False
+        if host_health_check.is_reachable is True:
+            result = True
             break
 
     return result

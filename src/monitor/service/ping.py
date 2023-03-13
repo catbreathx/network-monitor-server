@@ -64,15 +64,16 @@ class PingService:
         all_hosts_pinged = True
 
         for host in hosts:
-            success, ping_output = self._perform_ping(host)
-            health_check = schema.HostHealthCheckIn(
-                is_reachable=success,
-                output_text=ping_output,
-                host_id=host.id,
-                scheduled_job_id=scheduled_job.id,
-            )
-            all_hosts_pinged = (all_hosts_pinged == success) is True
-            self._host_health_check_repository.create_resource(self._db, health_check)
+            if host.enabled is True:
+                success, ping_output = self._perform_ping(host)
+                health_check = schema.HostHealthCheckIn(
+                    is_reachable=success,
+                    output_text=ping_output,
+                    host_id=host.id,
+                    scheduled_job_id=scheduled_job.id,
+                )
+                all_hosts_pinged = (all_hosts_pinged is success) is True
+                self._host_health_check_repository.create_resource(self._db, health_check)
 
         scheduled_job.data = {"success": all_hosts_pinged}
         return scheduled_job

@@ -2,13 +2,23 @@ import datetime
 import os
 from pathlib import Path
 from typing import Iterator
+from unittest import mock
 
 import pytest
+import sqlalchemy
 from fastapi_mail import ConnectionConfig
 from pydantic import EmailStr
 from sqlalchemy.orm.collections import InstrumentedList
 
 from monitor.database import models
+
+
+@pytest.fixture
+@mock.patch("sqlalchemy.orm.session.Session", autospec=True)
+def mock_db_session(
+    mock_db_session: sqlalchemy.orm.session.Session,
+) -> sqlalchemy.orm.session.Session:
+    return mock_db_session
 
 
 @pytest.fixture
@@ -29,6 +39,14 @@ def good_hosts() -> Iterator[models.Host]:
 def bad_hosts() -> Iterator[models.Host]:
     host_windows = models.Host(name="Windows", ip_address="10.10.0.10", enabled=False, id=10)
     yield [host_windows]
+
+
+@pytest.fixture
+def all_hosts(
+    good_hosts: Iterator[models.Host], bad_hosts: Iterator[models.Host]
+) -> Iterator[models.Host]:
+    hosts = good_hosts + bad_hosts
+    yield hosts
 
 
 @pytest.fixture

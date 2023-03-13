@@ -10,7 +10,7 @@ from .scheduled_job import ScheduledJobRepository
 from .user import UserRepository
 
 
-def get_db_session() -> Iterator[Session]:
+def get_db_session() -> Session:
     db = get_session()
     try:
         yield db

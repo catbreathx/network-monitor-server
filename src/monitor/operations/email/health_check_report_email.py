@@ -1,3 +1,4 @@
+import asyncio
 import os
 from pathlib import Path
 
@@ -5,6 +6,7 @@ from fastapi_mail import ConnectionConfig
 from pydantic import EmailStr
 from requests import Session
 
+from monitor import repository
 from monitor.database import models
 from monitor.operations.email import schema, template_data
 from monitor.operations.email.email_notification import EmailNotification
@@ -13,18 +15,32 @@ from monitor.settings.app_settings import Settings
 
 class HealthCheckReportGenerator:
     _db_session: Session
-    email_sender: EmailNotification
+    _host_repository: repository.HostRepository
+    _email_sender: EmailNotification
 
-    def __init__(self, db_session: Session, email_sender: EmailNotification) -> None:
+    def __init__(
+        self,
+        db_session: Session,
+        email_sender: EmailNotification,
+        host_repository: repository.HostRepository,
+    ) -> None:
         super().__init__()
         self._db_session = db_session
-        self.email_sender = email_sender
+        self._email_sender = email_sender
+        self._host_repository = host_repository
 
     def generate_report(self, scheduled_job: models.ScheduledJob) -> None:
-        data = template_data.HealthCheckReport(scheduled_job, scheduled_job.host_health_checks)
+        hosts = self._host_repository.get_all(self._db_session)
+        data = template_data.HealthCheckReport(
+            scheduled_job=scheduled_job,
+            hosts=hosts,
+            host_health_checks=scheduled_job.host_health_checks,
+        )
+
         recipients = [EmailStr("stewart01@mac.com")]
-        email = schema.EmailSchema(recipients_email=recipients, body=data.json())
-        self.email_sender.send_email(email)
+        body = {"data": data.json(), "first_name": "test@email.com"}
+        email = schema.EmailSchema(recipients_email=recipients, body=body)
+        asyncio.run(self._email_sender.send_email(email))
 
 
 def create_report_generator(
@@ -43,5 +59,10 @@ def create_report_generator(
         MAIL_FROM=EmailStr(app_settings.mail_from),
     )
     email_notification = EmailNotification(connection_config)
-    result = HealthCheckReportGenerator(db_session=db_session, email_sender=email_notification)
+    result = HealthCheckReportGenerator(
+        db_session=db_session,
+        email_sender=email_notification,
+        host_repository=repository.HostRepository(),
+    )
+
     return result

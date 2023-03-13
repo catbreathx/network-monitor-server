@@ -1,4 +1,3 @@
-from fastapi import Depends
 from sqlalchemy.orm import Session
 
 from monitor.database import models
@@ -11,7 +10,11 @@ class HostHealthCheckService:
     _host_health_check_repository: HostHealthCheckRepository
     _health_check_report_generator = email.HealthCheckReportGenerator
 
-    def __init__(self, db: Session, host_health_check: HostHealthCheckRepository):
+    def __init__(
+        self,
+        db: Session,
+        host_health_check: HostHealthCheckRepository,
+    ):
         self._host_health_check_repository = host_health_check
         self._health_check_report_generator = email.create_report_generator(
             db_session=db, app_settings=app_settings()
@@ -21,8 +24,7 @@ class HostHealthCheckService:
         self._health_check_report_generator.generate_report(scheduled_job)
 
 
-def create_host_health_check_service(
-    db_session: Session = Depends(get_db_session),
-) -> HostHealthCheckService:
-    service = HostHealthCheckService(db_session, HostHealthCheckRepository())
+def create_host_health_check_service() -> HostHealthCheckService:
+    db_session = next(get_db_session())
+    service = HostHealthCheckService(db=db_session, host_health_check=HostHealthCheckRepository())
     return service

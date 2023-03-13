@@ -1,6 +1,6 @@
 Hi {{first_name}},
 
-Here's the health check report
+Here's the failure health check report for {{data.scheduled_job.date_time}}.
 
 <table>
     <tr>
@@ -9,9 +9,14 @@ Here's the health check report
     </tr>
 
     <tr>
-        {% for host in hosts %}
-        <td>{{ host.name }}</td>
-        <td>{{ ip_address }}</td>
+        {%- for record in data.host_health_check %}
+            {%- if not record.is_reachable %}
+                <td>{{ data.hosts[record.host_id].name }}</td>
+                <td>{{ data.hosts[record.host_id].ip_address }}</td>
+                <td>{{ record.output_text }}</td>
+            {% endif %}
         {% endfor %}
     </tr>
 </table>
+
+Thanks

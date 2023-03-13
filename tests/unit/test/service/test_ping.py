@@ -10,7 +10,7 @@ from monitor.service.ping import PingService
 class TestPing:
     @pytest.fixture()
     def host(self) -> models.Host:
-        return models.Host(name="pi", ip_address="192.168.0.1", id=1)
+        return models.Host(name="pi", ip_address="192.168.0.1", id=1, enabled=True)
 
     @mock.patch("monitor.operations.perform_ping", autospec=True)
     @mock.patch("sqlalchemy.orm.session.Session", autospec=True)
