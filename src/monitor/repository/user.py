@@ -39,8 +39,7 @@ class UserRepository(AbstractBaseRepository):
 
     def authenticate_user(self, session: Session, email: str, password: str) -> models.User | None:
         user: models.User = self.get_by_email(session, email)
-        is_authenticated = False
-
+        user.enabled
         if user is None:
             logger.info(f"User {email} not found")
             return None
@@ -53,6 +52,6 @@ class UserRepository(AbstractBaseRepository):
             logger.warning(f"User {email}: incorrect password")
             return None
 
-        logging.info(f"User {email} is authenticated = {is_authenticated}")
+        logging.info(f"User {email} authenticated.")
 
         return user

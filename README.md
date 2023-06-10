@@ -55,6 +55,14 @@ Or, to apply up to a specific revision
 alembic upgrade <revision id>
 ```
 
+## Start Application
+
+Run:
+```
+export ENV_FILE=dev.env
+uvicorn monitor.app:app_instance --reload --port 5001
+```
+
 ### Create a new Migration
 
 To create a new revision:

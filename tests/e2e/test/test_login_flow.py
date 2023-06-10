@@ -1,12 +1,14 @@
 from http import HTTPStatus
 
+from e2e import api_commands
+
 from monitor import schema
-from tests.e2e import commands, utils
+from tests.e2e import auth_commands, utils
 
 
 class TestUserFlow:
     def test_user_flow(self, test_user: schema.User):
-        response = commands.login(test_user.email, "password")
+        response = auth_commands.login(test_user.email, "password")
         access_token = utils.get_access_token(response)
 
         payload = {
@@ -19,7 +21,7 @@ class TestUserFlow:
 
         user_create = schema.UserCreate(**payload)
 
-        response = commands.create_user(user_create, access_token)
+        response = api_commands.create_user(user_create, access_token)
 
         assert response.status_code == HTTPStatus.CREATED
 

@@ -3,24 +3,9 @@ from fastapi.encoders import jsonable_encoder
 from requests import Response
 
 from monitor import schema
-from tests.e2e import utils
 from tests.e2e.request_utils import JWTAuth
 
 BASE_URL = "http://localhost:5002/api/v1"
-
-
-def login(email: str, password: str) -> Response:
-    credentials = schema.Credentials(email=email, password=password)
-    response = requests.post(_get_url("/login"), json=credentials.dict())
-
-    return response
-
-
-def authenticate(email: str) -> str:
-    response = login(email, "password")
-    access_token = utils.get_access_token(response)
-
-    return access_token
 
 
 def create_user(user_create: schema.UserCreate, access_token: str) -> Response:
@@ -35,11 +20,6 @@ def create_host(host_create: schema.HostCreate, access_token: str) -> Response:
     response = requests.post(_get_url("/hosts"), json=json, auth=JWTAuth(access_token))
 
     return response
-
-
-def _get_url(path: str) -> str:
-    result = f"{BASE_URL}{path}"
-    return result
 
 
 def update_host(resource_id: int, host_update: schema.HostUpdate, access_token: str) -> Response:
@@ -64,3 +44,8 @@ def get_all_hosts(access_token: str) -> Response:
 def run_health_check(access_token: str):
     response = requests.post(_get_url("/scheduledjob/ping"), auth=JWTAuth(access_token))
     return response
+
+
+def _get_url(path: str) -> str:
+    result = f"{BASE_URL}{path}"
+    return result

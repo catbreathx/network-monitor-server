@@ -33,7 +33,7 @@ class AbstractBaseRepository(ABC):
     ) -> models.AbstractBaseModel:
         resource = self.model(**schema_create.dict())
         session.add(resource)
-        session.flush()
+
         return resource
 
     def update_resource(
@@ -41,6 +41,5 @@ class AbstractBaseRepository(ABC):
     ) -> models.AbstractBaseModel:
         statement = update(self.model).where(self.model.id == resource.id).values(resource.json())
         session.execute(statement)
-        session.commit()
 
         return resource

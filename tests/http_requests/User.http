@@ -18,7 +18,7 @@ client.test('Post was successful', () => {
 
 ###
 
-POST http://{{host}}/api/v1/login
+POST http://{{host}}/auth/v1/login
 Content-Type: application/json
 
 {

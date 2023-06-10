@@ -39,7 +39,12 @@ class HostService:
 
         existing_host.update_from(update_host.dict())
 
-        self._host_repository.update_resource(self._db, existing_host)
+        try:
+            self._host_repository.update_resource(self._db, existing_host)
+            self._db.commit()
+        except Exception as e:
+            self._db.rollback()
+            raise e
 
         return existing_host
 

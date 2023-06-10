@@ -1,9 +1,23 @@
-POST http://{{host}}/api/v1/login
+POST http://{{host}}/auth/v1/login
 Content-Type: application/json
 
 {
-  "email": "someone@email.com",
-  "password": "password"
+  "email": "stewart@stewarthector.com",
+  "password": "12#$password"
 }
+
+> {%
+client.test("Set authorization", function () {
+    client.assert(response.status === 200, "Response status is not 200");
+});
+%}
+
+> {% client.global.set("auth_token", response.body.json.token); %}
+
+### Authorization by token, part 2. Use token to authorize.
+POST http://{{host}}/
+Authorization: Bearer {{auth_token}}
+
+
 
 ###

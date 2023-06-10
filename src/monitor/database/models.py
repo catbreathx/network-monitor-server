@@ -60,7 +60,7 @@ class User(AbstractBaseModel):
     account_confirmed: Mapped[bool] = mapped_column(default=False, nullable=False)
     password_change_token: Mapped[Optional[str]] = mapped_column(nullable=True)
 
-    UniqueConstraint("email", name="uq_email")
+    UniqueConstraint("email")
 
     @property
     def full_name(self):

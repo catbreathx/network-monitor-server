@@ -9,7 +9,7 @@ from monitor.authentication import jwt
 from monitor.settings import app_settings
 
 router = APIRouter(
-    prefix="/api/v1/login",
+    prefix="/auth/v1/login",
 )
 
 logger = logging.getLogger(__name__)
@@ -24,6 +24,7 @@ def login(
     user = login_service.authenticate_login(credentials)
 
     if user is None:
+        logging.info(f"Incorrect credentials {credentials}")
         raise HTTPException(status_code=HTTPStatus.UNAUTHORIZED)
 
     private_key = app_settings().jwt_private_key.get_secret_value()
@@ -38,6 +39,8 @@ def login(
     refresh_token = jwt.create_refresh_token(
         user.email, secret_key=private_key, algorithm=app_settings().jwt_algorithm
     )
+
+    logger.info(f"User {user.email} logged in.")
 
     return {"access_token": jwt_token, "refresh_token": refresh_token}
 

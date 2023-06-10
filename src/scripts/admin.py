@@ -32,6 +32,10 @@ def create_user(email: str, password: str, first_name: str, last_name: str, conf
     user_service = UserService(db.get_session(), user_repository)
     new_user = user_service.create_user(user)
 
+    new_user.account_confirmed = True
+    new_user.enabled = True
+    new_user.save()
+
     click.echo(f"Created User - User ID {new_user.id}")
 
 
