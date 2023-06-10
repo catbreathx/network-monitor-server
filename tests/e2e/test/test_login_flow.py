@@ -1,9 +1,7 @@
 from http import HTTPStatus
 
-from e2e import api_commands
-
 from monitor import schema
-from tests.e2e import auth_commands, utils
+from tests.e2e import api_commands, auth_commands, utils
 
 
 class TestUserFlow:

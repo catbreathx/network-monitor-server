@@ -2,11 +2,11 @@ from http import HTTPStatus
 from typing import List
 
 import pytest
-from e2e import api_commands, auth_commands
 from requests import Session
 
 from monitor import schema
 from monitor.database import models
+from tests.e2e import api_commands, auth_commands
 
 
 @pytest.fixture()
