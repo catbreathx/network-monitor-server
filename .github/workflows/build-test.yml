@@ -43,7 +43,7 @@ jobs:
           path: "."
 
       - name: Setup Poetry
-        uses: Gr1N/setup-poetry@v7
+        uses: Gr1N/setup-poetry@v8
 
       - name: Install Dependencies
         run: poetry install
